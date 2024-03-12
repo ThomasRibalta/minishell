@@ -17,7 +17,6 @@ void signal_handler(int signum, siginfo_t *siginfo, void *context) {
     }
     else
         return ;
-    printf("\nSignal %d reçu. Ignoré.\n", signum);
 }
 
 void init_sigaction(struct sigaction *sig)
