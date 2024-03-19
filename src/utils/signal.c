@@ -1,14 +1,14 @@
 #include "../header/minishell.h"
 
-void init_mask(struct sigaction *sig)
+void    init_mask(struct sigaction *sig)
 {
     sigemptyset(&sig->sa_mask);
     sigaddset(&sig->sa_mask, SIGINT);
     sigaddset(&sig->sa_mask, SIGQUIT);
-
 }
 
-void signal_handler(int signum, siginfo_t *siginfo, void *context) {
+void signal_handler(int signum, siginfo_t *siginfo, void *context) 
+{
     if (signum == SIGINT)
     {
         write(1,"\n", 2);

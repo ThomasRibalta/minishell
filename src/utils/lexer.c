@@ -275,11 +275,11 @@ void chained_split_prompt(Token **list, char **tab)
         else if (tab[j][0] == '|' && tab[j][1] == '\0')
             appendToken(list, TOKEN_PIPE, tab[j]);
         else if (tab[j][0] == '<' && tab[j][1] == '\0')
-            appendToken(list, TOKEN_REDIRECTION_IN, tab[j]);
+            appendToken(list, TOKEN_REDIRECTION_IN, tab[++j]);
         else if (tab[j][0] == '>' && tab[j][1] == '\0')
-            appendToken(list, TOKEN_REDIRECTION_OUT, tab[j]);
+            appendToken(list, TOKEN_REDIRECTION_OUT, tab[++j]);
         else if (tab[j][0] == '>' && tab[j][1] == '>')
-            appendToken(list, TOKEN_REDIRECTION_APPEND, tab[j]);
+            appendToken(list, TOKEN_REDIRECTION_APPEND, tab[++j]);
         else if (tab[j][0] == '&' && tab[j][1] == '&')
             appendToken(list, TOKEN_LOGICAL_AND, tab[j]);
         else if (tab[j][0] == '|' && tab[j][1] == '|')
