@@ -3,23 +3,6 @@
 #include <string.h>
 #include "../header/minishell.h"
 
-typedef enum {
-    TOKEN_PAREN, // (
-    TOKEN_COMMAND, // Command name
-    TOKEN_LOGICAL_AND, // &&
-    TOKEN_LOGICAL_OR, // ||
-    TOKEN_PIPE, // |
-    TOKEN_REDIRECTION_IN, // <
-    TOKEN_REDIRECTION_OUT, // >
-    TOKEN_REDIRECTION_APPEND, // >>
-} TokenType;
-
-typedef struct Token {
-    TokenType type;
-    char* value;
-    struct Token* next;
-} Token;
-
 // Fonction pour créer un nouveau token
 Token* createToken(TokenType type, const char* value) {
     Token* token = (Token*)malloc(sizeof(Token));
@@ -273,7 +256,7 @@ void chained_split_prompt(Token **list, char **tab)
         if (tab[j][0] == '(')
             appendToken(list, TOKEN_PAREN, tab[j]);
         else if (tab[j][0] == '|' && tab[j][1] == '\0')
-            appendToken(list, TOKEN_PIPE, tab[j]);
+            appendToken(list, TOKEN_PIPE, NULL);
         else if (tab[j][0] == '<' && tab[j][1] == '\0')
             appendToken(list, TOKEN_REDIRECTION_IN, tab[++j]);
         else if (tab[j][0] == '>' && tab[j][1] == '\0')
@@ -281,9 +264,9 @@ void chained_split_prompt(Token **list, char **tab)
         else if (tab[j][0] == '>' && tab[j][1] == '>')
             appendToken(list, TOKEN_REDIRECTION_APPEND, tab[++j]);
         else if (tab[j][0] == '&' && tab[j][1] == '&')
-            appendToken(list, TOKEN_LOGICAL_AND, tab[j]);
+            appendToken(list, TOKEN_LOGICAL_AND, NULL);
         else if (tab[j][0] == '|' && tab[j][1] == '|')
-            appendToken(list, TOKEN_LOGICAL_OR, tab[j]);
+            appendToken(list, TOKEN_LOGICAL_OR, NULL);
         else
             appendToken(list, TOKEN_COMMAND, tab[j]);
         j++;
@@ -331,5 +314,6 @@ void lexer(char *input)
     tab_input = tab_clean(tab_input);
     printf("\n-=-=Liste Chainée=-=-\n");
     printTokens(list);
+    parser(list);
     freeTokens(list);
 }
