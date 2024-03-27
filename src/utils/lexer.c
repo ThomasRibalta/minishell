@@ -107,7 +107,7 @@ int in_special_zone(char *input, int i)
 int is_separator(char *s, int i) {
     if ((s[i] == '|' && s[i + 1] == '|') || (s[i] == '&' && s[i + 1] == '&'))
         return 1;
-    else if (s[i] == '<' || s[i] == '>' || s[i] == '|' | s[i] == '&')
+    else if (s[i] == '<' || s[i] == '>' || s[i] == '|')
         return 1;
     else if (s[i] == '>' && s[i + 1] == '>')
         return 1;
@@ -151,6 +151,8 @@ int count_words(char *str)
         if (check_separator(str, i))
         {
             i += len_separator(str, i) - 1;
+            if (str[i] == '<' || str[i] == '>')
+                j++;
             j++;
         }
         i++;
@@ -203,6 +205,36 @@ char *get_separator(char *s)
     return (sep);
 }
 
+int	ft_strlenc_file(char *str, char c)
+{
+	int	i;
+    int j;
+
+	i = 0;
+    j = 0;
+    while (str[i] == c)
+        i++;
+	while (str[i] != '\0' && str[i] != c && !is_separator(str, i))
+		i++;
+	return (i + j);
+}
+
+char	*get_word_file(char *str, char c)
+{
+	char	*word;
+	int		i;
+
+	i = 0;
+	word = malloc(sizeof(char) * (ft_strlenc_file(str, c) + 1));
+	while (i < ft_strlenc_file(str, c))
+	{
+		word[i] = str[i];
+		i++;
+	}
+	word[i] = '\0';
+	return (word);
+}
+
 char	**split_prompt(char *s)
 {
 	char	**tab;
@@ -217,14 +249,25 @@ char	**split_prompt(char *s)
 	while (s[j] != '\0')
 	{
 		while (s[j] != '\0' && check_separator(s, j))
-        		j += len_separator(s + j, 0);
+        {
+                if (s[j] == '<' || s[j] == '>')
+                {
+                    tab[i++] = get_separator(s + j);
+        		    j += len_separator(s + j, 0);
+                    tab[i++] = get_word_file(s + j, ' ');
+                    j += ft_strlenc_file(s + j, ' ');
+                }
+                else
+                {
+                    tab[i++] = get_separator(s + j);
+                    j += len_separator(s + j, 0);
+                }
+        }
 		if (s[j] != '\0')
 		{
 			tab[i] = get_word(s + j);
 			i++;
             j += ft_strlenc(s + j);
-            if (s[j] != '\0')
-                tab[i++] = get_separator(s + j);
 		}
 	}
 	tab[i] = 0;
@@ -252,11 +295,10 @@ void chained_split_prompt(Token **list, char **tab)
     j = 0;
     while (tab[j])
     {
-        printf("%s : %d, %d\n", tab[j], tab[j][0], tab[j][1]);
         if (tab[j][0] == '(')
             appendToken(list, TOKEN_PAREN, tab[j]);
         else if (tab[j][0] == '|' && tab[j][1] == '\0')
-            appendToken(list, TOKEN_PIPE, NULL);
+            appendToken(list, TOKEN_PIPE, tab[j]);
         else if (tab[j][0] == '<' && tab[j][1] == '\0')
             appendToken(list, TOKEN_REDIRECTION_IN, tab[++j]);
         else if (tab[j][0] == '>' && tab[j][1] == '\0')
@@ -264,9 +306,9 @@ void chained_split_prompt(Token **list, char **tab)
         else if (tab[j][0] == '>' && tab[j][1] == '>')
             appendToken(list, TOKEN_REDIRECTION_APPEND, tab[++j]);
         else if (tab[j][0] == '&' && tab[j][1] == '&')
-            appendToken(list, TOKEN_LOGICAL_AND, NULL);
+            appendToken(list, TOKEN_LOGICAL_AND, tab[j]);
         else if (tab[j][0] == '|' && tab[j][1] == '|')
-            appendToken(list, TOKEN_LOGICAL_OR, NULL);
+            appendToken(list, TOKEN_LOGICAL_OR, tab[j]);
         else
             appendToken(list, TOKEN_COMMAND, tab[j]);
         j++;
@@ -291,7 +333,7 @@ char **tab_clean(char **tab)
     int     j;
 
     j = 0;
-    new_tab = malloc(sizeof(char *) * len_tab(tab));
+    new_tab = malloc(sizeof(char *) * len_tab(tab) + 1);
     while (tab[j])
     {
         new_tab[j] = clean_white_space(tab[j]);
@@ -299,8 +341,34 @@ char **tab_clean(char **tab)
     }
     free(tab);
     new_tab[j] = 0;
-    aff_table(new_tab);
     return (new_tab);
+}
+
+int check_error_tab(char **tab_input){
+    int j;
+
+    j = 0;
+    if (tab_input[j][0] == '|' || tab_input[j][0] == '&')
+    {
+        printf("Lexer error near : %s\n", tab_input[j]);
+        return (0);
+    }
+    while (tab_input[j]){
+        if ((tab_input[j][0] == '|' || tab_input[j][0] == '&') && 
+            (tab_input[j + 1][0] == '|' || tab_input[j + 1][0] == '&'))
+            {
+                printf("Lexer error near : %s + %s\n", tab_input[j], tab_input[j + 1]);
+                return (0);
+            }
+        if ((tab_input[j][0] == '>' || tab_input[j][0] == '<') && 
+            (tab_input[j + 1][0] == '>' || tab_input[j + 1][0] == '<'))
+            {
+                printf("Lexer error near : %s + %s\n", tab_input[j], tab_input[j + 1]);
+                return (0);
+            }
+        j++;
+    }
+    return (1);
 }
 
 void lexer(char *input)
@@ -310,8 +378,9 @@ void lexer(char *input)
 
     tab_input = split_prompt(input);
     aff_table(tab_input);
-    chained_split_prompt(&list, tab_input);
     tab_input = tab_clean(tab_input);
+    if(!check_error_tab(tab_input)) return ;
+    chained_split_prompt(&list, tab_input);
     printf("\n-=-=Liste Chainée=-=-\n");
     printTokens(list);
     parser(list);

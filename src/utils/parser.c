@@ -235,5 +235,5 @@ void parser(Token *token)
 	assignRedirections(startNode, token);
 	// generateAndAttachBTree(startNode, token);
 
-	printLogicalNodes(startNode);
+	//printLogicalNodes(startNode);
 }
