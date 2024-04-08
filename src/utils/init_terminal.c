@@ -30,6 +30,19 @@ void  edit_shlvl(char **env)
     }
 }
 
+char **clone_env(char **env) {
+    size_t num_elements = 0;
+    while (env[num_elements] != NULL) {
+        num_elements++;
+    }
+    char **env_clone = malloc((num_elements + 1) * sizeof(char *));
+    for (size_t i = 0; i < num_elements; i++) {
+        env_clone[i] = strdup(env[i]);
+    }
+    env_clone[num_elements] = NULL;
+    return env_clone;
+}
+
 void  init_terminal(char **env)
 {
   edit_shlvl(env);
