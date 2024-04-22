@@ -1,4 +1,4 @@
-#include "../../header/minishell.h";
+#include "../../header/minishell.h"
 
 void cd(const char *path){
     if (chdir(path) == -1) {

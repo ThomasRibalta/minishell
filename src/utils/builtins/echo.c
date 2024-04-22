@@ -13,7 +13,7 @@ void echo(char *str){
     printf("%s ",tab[j]);
     j++;
   }
-  if (ft_strcmp(tab[1], "-n"))
+  if (ft_strncmp(tab[1], "-n", 2))
   {
     printf("\n");
   }
