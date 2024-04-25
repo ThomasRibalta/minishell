@@ -1,4 +1,4 @@
- #include "parser.h"
+#include "../../header/minishell.h"
 
 // Function to count the number of logical nodes (&& and ||)
 int countLogicalNodes(Token* tokens) {

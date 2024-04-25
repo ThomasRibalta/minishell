@@ -111,6 +111,8 @@ int is_separator(char *s, int i) {
         return 1;
     else if (s[i] == '>' && s[i + 1] == '>')
         return 1;
+    else if (s[i] == '<' && s[i + 1] == '<')
+        return 1;
     else
         return 0;
 }
@@ -120,6 +122,8 @@ int len_separator(char *s, int i)
     if ((s[i] == '|' && s[i + 1] == '|') || (s[i] == '&' && s[i + 1] == '&'))
         return 2;
     else if (s[i] == '>' && s[i + 1] == '>')
+        return 2;
+    else if (s[i] == '<' && s[i + 1] == '<')
         return 2;
     else if (s[i] == '<' || s[i] == '>' || s[i] == '|')
         return 1;
@@ -288,6 +292,27 @@ char   **aff_table(char **tab)
     return (tab);
 }
 
+char *here_doc(char *end)
+{
+    char *value;
+    char	*tmp;
+	int		i;
+
+	i = 0;
+    value = malloc(sizeof(char *));
+    value[0] = '\0';
+	while (i != 1)
+	{
+		write(1, "Here_doc >> ", 13);
+		tmp = get_next_line(0);
+		if (ft_strncmp(tmp, end, ft_strlen(end)) == 0)
+			i++;
+        value = ft_strjoin(value, tmp);
+        free(tmp);
+	}
+    return (value);
+}
+
 void chained_split_prompt(Token **list, char **tab)
 {
     int j;
@@ -305,6 +330,8 @@ void chained_split_prompt(Token **list, char **tab)
             appendToken(list, TOKEN_REDIRECTION_OUT, tab[++j]);
         else if (tab[j][0] == '>' && tab[j][1] == '>')
             appendToken(list, TOKEN_REDIRECTION_APPEND, tab[++j]);
+        else if (tab[j][0] == '<' && tab[j][1] == '<')
+            appendToken(list, TOKEN_HEREDOC, here_doc(tab[++j]));
         else if (tab[j][0] == '&' && tab[j][1] == '&')
             appendToken(list, TOKEN_LOGICAL_AND, tab[j]);
         else if (tab[j][0] == '|' && tab[j][1] == '|')

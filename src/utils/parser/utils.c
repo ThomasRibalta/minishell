@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "../../header/minishell.h"
 
 // Function to get a string representation of the node type
 const char* getNodeTypeString(NodeType type) {

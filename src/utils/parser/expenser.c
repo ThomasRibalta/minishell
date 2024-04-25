@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "../../header/minishell.h"
 
 void processBinaryTree(ASTNode* node, void (*processStr)(char**)) {
     if (node == NULL) return;
