@@ -18,8 +18,8 @@ SRC_1 = src/utils/parser/expenser.c \
 				src/utils/builtins/export.c \
 				src/utils/builtins/pwd.c \
 				src/utils/builtins/unset.c \
-				src/utils/GetNextLine/get_next_line_utils.c \
-				src/utils/GetNextLine/get_next_line.c
+				src/utils/gnl/get_next_line_utils.c \
+				src/utils/gnl/get_next_line.c
 			
 
 OBJ_1 = ${SRC_1:.c=.o}

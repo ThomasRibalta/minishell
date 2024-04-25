@@ -2,7 +2,7 @@
 # define MINISHELL_H
 
 # include "../utils/libft/libft.h"
-# include "../utils/GetNextLine/get_next_line.h"
+# include "../utils/gnl/get_next_line.h"
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <stdio.h>
