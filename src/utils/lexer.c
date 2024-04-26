@@ -267,6 +267,8 @@ char	**split_prompt(char *s)
                     j += len_separator(s + j, 0);
                 }
         }
+        while (s[j] == ' ')
+            j++;
 		if (s[j] != '\0')
 		{
 			tab[i] = get_word(s + j);
@@ -306,7 +308,7 @@ char *here_doc(char *end)
 		write(1, "Here_doc >> ", 13);
 		tmp = get_next_line(0);
 		if (ft_strncmp(tmp, end, ft_strlen(end)) == 0)
-			i++;
+			break ;
         value = ft_strjoin(value, tmp);
         free(tmp);
 	}

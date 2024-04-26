@@ -131,14 +131,6 @@ ASTNode* buildCommandPipeTree(Token** currentToken) {
             case TOKEN_PAREN:
                 // Create command or parenthetical node
                 currentCommand = createASTNode((*currentToken)->type == TOKEN_COMMAND ? NODE_COMMAND : NODE_PARENTHESE, (*currentToken)->value);
-                // Attach any pending redirections
-                currentCommand->inputs = tempInputs;
-                currentCommand->outputs = tempOutputs;
-                currentCommand->appends = tempAppends;
-                currentCommand->here_doc = tempHereDoc;
-                // Reset redirections
-                tempInputs = tempOutputs = tempAppends = tempHereDoc = NULL;
-                // Insert the node into the tree
                 if (root == NULL) {
                     root = currentCommand;
                 } else {
@@ -166,6 +158,12 @@ ASTNode* buildCommandPipeTree(Token** currentToken) {
                         last->right = currentCommand;
                     }
                 }
+				else {
+					currentCommand->inputs = tempInputs;
+                    currentCommand->outputs = tempOutputs;
+                    currentCommand->appends = tempAppends;
+                    currentCommand->here_doc = tempHereDoc;
+				}
                 // Reset current command after handling pipes
                 if ((*currentToken)->type == TOKEN_PIPE) {
                     ASTNode* pipeNode = createASTNode(NODE_PIPE, "|");
@@ -214,10 +212,15 @@ ASTNode* buildCommandPipeTree(Token** currentToken) {
             last->right = currentCommand;
         }
     }
+	else {
+		currentCommand->inputs = tempInputs;
+        currentCommand->outputs = tempOutputs;
+        currentCommand->appends = tempAppends;
+        currentCommand->here_doc = tempHereDoc;
+	}
 
     return root;
 }
-
 
 void generateAndAttachBTree(StartNode* startNode, Token* tokens) {
     if (!startNode->hasLogical) {
@@ -248,7 +251,6 @@ void generateAndAttachBTree(StartNode* startNode, Token* tokens) {
         }
     }
 }
-
 
 void parser(Token *tokens) {
     //Token *tokens = lexer();

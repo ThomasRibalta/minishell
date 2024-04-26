@@ -14,7 +14,6 @@ const char* getNodeTypeString(NodeType type) {
     }
 }
 
-// Helper function to print redirections with proper formatting
 void printRedirections(const Redirection* redir) {
     const char* sep = "";  // Start with no separator
     while (redir) {
@@ -27,37 +26,41 @@ void printRedirections(const Redirection* redir) {
 void printAST(const ASTNode* node, int level) {
     if (node == NULL) return;
 
-    // Print left subtree first
-    printAST(node->left, level + 1);
-
-    // Print current node with indentation
+    // Print the node type and value with indentation
     printf("%*s%s", level * 4, "", getNodeTypeString(node->type));
     if (node->value) {
         printf(": %s", node->value);
     }
+
+    // Print redirections if they exist
     if (node->inputs || node->outputs || node->appends || node->here_doc) {
         printf(" [");
         bool first = true;
         if (node->inputs) {
-            printf("In: %s", node->inputs->filename);
+            printf("In: ");
+            printRedirections(node->inputs);
             first = false;
         }
         if (node->outputs) {
-            printf("%sOut: %s", first ? "" : "; ", node->outputs->filename);
+            printf("%sOut: ", first ? "" : "; ");
+            printRedirections(node->outputs);
             first = false;
         }
         if (node->appends) {
-            printf("%sAppend: %s", first ? "" : "; ", node->appends->filename);
+            printf("%sAppend: ", first ? "" : "; ");
+            printRedirections(node->appends);
             first = false;
         }
         if (node->here_doc) {
-            printf("%sHereDoc: %s", first ? "" : "; ", node->here_doc->filename);
+            printf("%sHereDoc: ", first ? "" : "; ");
+            printRedirections(node->here_doc);
         }
         printf("]");
     }
     printf("\n");
 
-    // Print right subtree last
+    // Recursively print the left and right subtrees
+    printAST(node->left, level + 1);
     printAST(node->right, level + 1);
 }
 
