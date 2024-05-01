@@ -8,6 +8,7 @@ SRC_1 = src/utils/parser/expenser.c \
 				src/utils/parser/utils.c \
 				src/utils/parser/wildcard.c \
 				src/utils/init_terminal.c \
+				src/utils/executer.c \
 				src/utils/lexer.c \
 				src/utils/prompt_utils.c \
 				src/utils/signal.c \

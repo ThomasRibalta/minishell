@@ -54,7 +54,7 @@ void expandCommandTrees(StartNode* startNode, void (*processStr)(char**)) {
 
 
 void printCommandNode(char **str) {
-	printf("%s\n", *str);
+	printf("|%s|\n", *str);
 }
 
 void expandWildcards(char **str) {

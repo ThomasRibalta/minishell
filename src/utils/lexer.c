@@ -400,7 +400,7 @@ int check_error_tab(char **tab_input){
     return (1);
 }
 
-void lexer(char *input)
+void lexer(char *input, char **env)
 {
     char **tab_input;
     Token *list = NULL;
@@ -412,6 +412,6 @@ void lexer(char *input)
     chained_split_prompt(&list, tab_input);
     printf("\n-=-=Liste Chainée=-=-\n");
     printTokens(list);
-    parser(list);
+    parser(list, env);
     freeTokens(list);
 }

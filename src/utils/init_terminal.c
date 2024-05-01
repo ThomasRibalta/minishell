@@ -63,6 +63,6 @@ void start_terminal(int ac, char **av, char **env)
             exit(1);
         }
         add_history(input);
-        check_prompt(input);
+        check_prompt(input, env);
     }
 }
