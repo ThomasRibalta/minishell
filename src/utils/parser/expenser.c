@@ -1,5 +1,6 @@
 #include "../../header/minishell.h"
 
+
 void processBinaryTree(ASTNode* node, void (*processStr)(char**)) {
     if (node == NULL) return;
 
@@ -54,31 +55,56 @@ void expandCommandTrees(StartNode* startNode, void (*processStr)(char**)) {
 
 
 void printCommandNode(char **str) {
-	printf("|%s|\n", *str);
+	printf("%s\n", *str);
 }
 
-void expandWildcards(char **str) {
+void is_last_command_btree(ASTNode* node) {
+    if (node == NULL) return;
+
+	while (node->right != NULL)
+	{
+		node = node->right;
+	}
+    node->is_last_command = true;
+}
+
+void is_last_command(StartNode* startNode) {
+    if (!startNode->hasLogical) {
+        is_last_command_btree(startNode->children[0]->left);
+    } else {
+        for (int i = 0; i < startNode->childCount; i++) {
+            is_last_command_btree(startNode->children[i]->left);
+            if (i == 0 && startNode->children[i]->right) {
+                is_last_command_btree(startNode->children[i]->right);
+            }
+        }
+    }
+}
+
+// Si node commande, si arguement, supprimer tout les inputs, sinon garder que le dernier
+// Si node parenthese, si arguement premiere commande, supprimer tout les inputs,
+// 	sinon pipe le dernier input, sinon aucun input, envoyer le pipe de la commande precedente
+void manage_redirection(ASTNode *node) {
 
 }
 
-void expandDot(char **str) {
-
-}
-
+// utiliser la fonction de thomas pour le path actuelle
 void convertPathToAbsolute(char **str) {
 
 }
 
+// utiliser fonction thomas pour les quotes externe
 void replaceEnvVars(char **str) {
 
 }
 
+// utiliser fonction thomas pour les quotes externe
 void detectBuiltInCommands(char **str) {
 
 }
 
-
 void expenser(StartNode* startNode)
 {
 	expandCommandTrees(startNode, printCommandNode);
+	is_last_command(startNode);
 }

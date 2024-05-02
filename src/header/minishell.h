@@ -63,6 +63,7 @@ typedef struct ASTNode {
     Redirection* outputs;
     Redirection* appends;
 	bool builtIn;
+	bool is_last_command;
 } ASTNode;
 
 typedef struct LogicalNode {

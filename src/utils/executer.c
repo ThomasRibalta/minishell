@@ -88,13 +88,16 @@ void	execute(char **param, char *path, char **env)
 	//free(path1);
 }
 
-void exec(ASTNode* node, char **env) {
+void exec(ASTNode* node, char **env, int test, int test2) {
     char **split_nodeValue;
+    int		p_id[2];
     pid_t pid;
 
     if (node == NULL || node->value == NULL) {
         return ;
     }
+    if (pipe(p_id) == -1)
+		    exit(0);
     split_nodeValue = ft_split(node->value, ' ');
     if (is_builtin(clean_quote(split_nodeValue[0])))
       write(1,"test\n", 5);
@@ -104,41 +107,56 @@ void exec(ASTNode* node, char **env) {
         return;
     }
     if (pid == 0) {
+      if (!(node->is_last_command))
+      {
+        dup2(p_id[1], 1);
+        close(p_id[0]);
+      }else
+      {
+        dup2(test, 1);
+        close(test);
+      }
       execute(split_nodeValue, get_path(env), env);
     } else {
-        int status;
-        waitpid(pid, &status, 0);
+      if (!(node->is_last_command))
+      {
+        close(p_id[1]);
+        dup2(p_id[0], 0);
+      }else
+      {
+        dup2(test2, STDIN_FILENO);
+        close(test2);
+      }
     }
 }
 
 
-void processBinaryTree2(ASTNode* node, char **env) {
+void processBinaryTree2(ASTNode* node, char **env, int test, int test2) {
     if (node == NULL) return;
-    processBinaryTree2(node->left, env);
+    processBinaryTree2(node->left, env, test, test2);
     if (node->type == NODE_COMMAND) {
-        exec(node, env);
+        exec(node, env, test, test2);
     }
-    processBinaryTree2(node->right, env);
+    processBinaryTree2(node->right, env, test, test2);
 }
 
 void expandCommandTrees2(StartNode* startNode, char **env) {
     if (!startNode->hasLogical) {
-        processBinaryTree2(startNode->children[0]->left, env);
+        int test = dup(STDOUT_FILENO);
+        int test2 = dup(STDIN_FILENO);
+        processBinaryTree2(startNode->children[0]->left, env, test, test2);
+        wait(NULL);
     } else {
+      int test, test2 = 1;
         for (int i = 0; i < startNode->childCount; i++) {
             if (startNode->children[i]->left) {
-                processBinaryTree2(startNode->children[i]->left, env);
+                processBinaryTree2(startNode->children[i]->left, env, test, test2);
             }
             if (i == 0 && startNode->children[i]->right) {
-                processBinaryTree2(startNode->children[i]->right, env);
+                processBinaryTree2(startNode->children[i]->right, env, test, test2);
             }
         }
     }
-}
-
-
-void printCommandNode2(char **str) {
-	printf("|%s|\n", *str);
 }
 
 void executer(StartNode* startNode, char **env)
