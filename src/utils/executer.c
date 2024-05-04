@@ -77,6 +77,27 @@ void execute(char **param, char *path, char **env) {
     //free(path1);
 }
 
+int execute_builtin(ASTNode *node, char **env, char **param){
+  printf("builtin : \n");
+  if (ft_strcmp(clean_quote(param[0]), "cd") == 0)
+    return (0);
+  else if (ft_strcmp(clean_quote(param[0]), "pwd") == 0)
+    printf("%s\n", get_cwd());
+  else if (ft_strcmp(clean_quote(param[0]), "unset") == 0)
+    return 0;
+  else if (ft_strcmp(clean_quote(param[0]), "export") == 0)
+    return 0;
+  else if (ft_strcmp(clean_quote(param[0]), "echo") == 0)
+    echo(param);
+  else if (ft_strcmp(clean_quote(param[0]), "env") == 0)
+    return 0;
+  else if (ft_strcmp(clean_quote(param[0]), "exit") == 0)
+    return 0;
+  else 
+    return 1;
+  exit(0);
+}
+
 // Fonction pour exécuter un nœud de l'arbre syntaxique abstrait (AST)
 void exec(ASTNode* node, char **env, int test, int test2, int* pids, int* pid_count) {
     char **split_nodeValue;
@@ -88,8 +109,6 @@ void exec(ASTNode* node, char **env, int test, int test2, int* pids, int* pid_co
     if (pipe(p_id) == -1)
         exit(0);
     split_nodeValue = ft_split(node->value, ' ');
-    if (is_builtin(clean_quote(split_nodeValue[0])))
-        write(1,"test\n", 5);
     pid = fork();
     if (pid == -1) {
         perror("fork");
@@ -103,6 +122,8 @@ void exec(ASTNode* node, char **env, int test, int test2, int* pids, int* pid_co
             dup2(test, 1);
             close(test);
         }
+        if (is_builtin(clean_quote(split_nodeValue[0])))
+          execute_builtin(node, env, split_nodeValue);
         execute(split_nodeValue, get_path(env), env);
     } else {
         if (!(node->is_last_command)) {

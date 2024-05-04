@@ -1,13 +1,11 @@
 #include "../../header/minishell.h"
 
-void echo(char *str){
-  char **tab;
-  char *new_str;
+void echo(char **tab){
   int j;
   
-  j = 0;
-  new_str = clean_quote(str);
-  tab = ft_split(new_str, ' ');
+  j = 1;
+  if (ft_strncmp(tab[j], "-n", 2))
+    j++;
   while (tab[j])
   {
     printf("%s ",tab[j]);

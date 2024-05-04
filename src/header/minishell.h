@@ -86,6 +86,7 @@ void	edit_shlvl(char **env);
 void	write_terminal_title(void);
 void	clear_terminal(char **env);
 void  parser(Token *tokens, char **env);
+void echo(char **tab);
 void lexer(char *input, char **env);
 void init_signal();
 void start_terminal(int ac, char **av, char **env);
