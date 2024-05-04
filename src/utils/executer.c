@@ -85,16 +85,15 @@ int execute_builtin(ASTNode *node, char **env, char **param){
     printf("%s\n", get_cwd());
   else if (ft_strcmp(clean_quote(param[0]), "unset") == 0)
     return 0;
-  else if (ft_strcmp(clean_quote(param[0]), "export") == 0)
-    return 0;
   else if (ft_strcmp(clean_quote(param[0]), "echo") == 0)
     echo(param);
+  else if (ft_strcmp(clean_quote(param[0]), "export") == 0)
+    exit(0);
   else if (ft_strcmp(clean_quote(param[0]), "env") == 0)
-    return 0;
-  else if (ft_strcmp(clean_quote(param[0]), "exit") == 0)
-    return 0;
+    print_env(env);
   else 
     return 1;
+  print_env(env);
   exit(0);
 }
 
@@ -109,6 +108,10 @@ void exec(ASTNode* node, char **env, int test, int test2, int* pids, int* pid_co
     if (pipe(p_id) == -1)
         exit(0);
     split_nodeValue = ft_split(node->value, ' ');
+    if (ft_strcmp(clean_quote(split_nodeValue[0]), "exit") == 0)
+        exit_program();
+    else if (ft_strcmp(clean_quote(split_nodeValue[0]), "export") == 0)
+        export_var(&env, split_nodeValue + 1);
     pid = fork();
     if (pid == -1) {
         perror("fork");
