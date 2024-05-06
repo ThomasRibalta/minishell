@@ -1,6 +1,6 @@
 #include "../../header/minishell.h"
 
-void unset_var(char ***env, const char *name)
+void unset_var2(char ***env, const char *name)
 {
     char **current;
     char **next;
@@ -22,4 +22,16 @@ void unset_var(char ***env, const char *name)
         }
         current++;
     }
+}
+
+void unset_var(char ***env, char **tab) 
+{
+    int i;
+
+    i = 0;
+    while(tab[i])
+    {
+        unset_var2(env, tab[i]);
+        i++;
+    }   
 }

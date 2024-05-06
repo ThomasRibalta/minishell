@@ -62,5 +62,4 @@ void export_var(char ***env, char **tab)
         }
         i++;
     }
-    print_env(*env);
 }

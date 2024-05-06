@@ -406,12 +406,12 @@ void lexer(char *input, char **env)
     Token *list = NULL;
 
     tab_input = split_prompt(input);
-    aff_table(tab_input);
+    //aff_table(tab_input);
     tab_input = tab_clean(tab_input);
     if(!check_error_tab(tab_input)) return ;
     chained_split_prompt(&list, tab_input);
-    printf("\n-=-=Liste Chainée=-=-\n");
-    printTokens(list);
+    //printf("\n-=-=Liste Chainée=-=-\n");
+    //printTokens(list);
     parser(list, env);
     freeTokens(list);
 }

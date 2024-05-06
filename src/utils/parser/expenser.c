@@ -105,6 +105,6 @@ void detectBuiltInCommands(char **str) {
 
 void expenser(StartNode* startNode)
 {
-	expandCommandTrees(startNode, printCommandNode);
+	//expandCommandTrees(startNode, printCommandNode);
 	is_last_command(startNode);
 }
