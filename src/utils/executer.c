@@ -2,6 +2,13 @@
 
 #include <string.h>
 
+typedef struct Command {
+    int *pids;
+    int pid_count;
+    int std_in;
+    int std_out;
+} command;
+
 int ft_strcmp(char *value1, char *value2) {
     while (*value1 && (*value1 == *value2)) {
         value1++;
@@ -96,7 +103,7 @@ int execute_builtin(ASTNode *node, char **env, char **param){
 }
 
 // Fonction pour exécuter un nœud de l'arbre syntaxique abstrait (AST)
-void exec(ASTNode* node, char **env, int test, int test2, int* pids, int* pid_count) {
+void exec(ASTNode* node, char **env, command *cmd) {
     char **split_nodeValue;
     int p_id[2];
     pid_t pid;
@@ -124,73 +131,73 @@ void exec(ASTNode* node, char **env, int test, int test2, int* pids, int* pid_co
             dup2(p_id[1], 1);
             close(p_id[0]);
         } else {
-            dup2(test, 1);
-            close(test);
+            dup2(cmd->std_out, 1);
+            close(cmd->std_out);
         }
         if (is_builtin(clean_quote(split_nodeValue[0])))
           execute_builtin(node, env, split_nodeValue);
         execute(split_nodeValue, get_path(env), env);
     } else {
         if (!(node->is_last_command)) {
-            close(p_id[1]);
             dup2(p_id[0], 0);
+            close(p_id[1]);
         } else {
-            dup2(test2, STDIN_FILENO);
-            close(test2);
+            dup2(cmd->std_in, STDIN_FILENO);
+            close(cmd->std_in);
         }
-        pids[*pid_count] = pid;
-        (*pid_count)++;
+        cmd->pids[cmd->pid_count] = pid;
+        (cmd->pid_count)++;
     }
 }
 
 // Fonction récursive pour traiter les nœuds de l'arbre syntaxique abstrait (AST)
-void processBinaryTree2(ASTNode* node, char **env, int test, int test2, int* pids, int* pid_count) {
+void processBinaryTree2(ASTNode* node, char **env, command *cmd) {
     if (node == NULL) return;
-    processBinaryTree2(node->left, env, test, test2, pids, pid_count);
+    processBinaryTree2(node->left, env, cmd);
     if (node->type == NODE_COMMAND) {
-        exec(node, env, test, test2, pids, pid_count);
+        exec(node, env, cmd);
     }
-    processBinaryTree2(node->right, env, test, test2, pids, pid_count);
+    processBinaryTree2(node->right, env, cmd);
+}
+
+command *init_command(int test, int test2) {
+    command *cmd = malloc(sizeof(command));
+    cmd->std_out = test;
+    cmd->std_in = test2;
+    cmd->pids = malloc(1024 * sizeof(int));
+    cmd->pid_count = 0;
+    return cmd;
 }
 
 // Fonction pour étendre les arbres de commandes et les exécuter
 void expandCommandTrees2(StartNode* startNode, char **env) {
     if (!startNode->hasLogical) {
-        int test = dup(STDOUT_FILENO);
-        int test2 = dup(STDIN_FILENO);
-        int max_pids = 1024;
-        int* pids = malloc(max_pids * sizeof(int));
-        int pid_count = 0;
-        processBinaryTree2(startNode->children[0]->left, env, test, test2, pids, &pid_count);
-        for (int i = 0; i < pid_count; i++) {
-            waitpid(pids[i], NULL, 0);
+        command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
+        processBinaryTree2(startNode->children[0]->left, env, cmd);
+        for (int i = 0; i < cmd->pid_count; i++) {
+            waitpid(cmd->pids[i], NULL, 0);
         }
-        free(pids);
+        free(cmd->pids);
+        free(cmd);
     } else {
         for (int i = 0; i < startNode->childCount; i++) {
             if (startNode->children[i]->left) {
-                int test = dup(STDOUT_FILENO);
-                int test2 = dup(STDIN_FILENO);
-                int max_pids = 1024;
-                int* pids = malloc(max_pids * sizeof(int));
-                int pid_count = 0;
-                processBinaryTree2(startNode->children[i]->left, env, test, test2, pids, &pid_count);
-                for (int j = 0; j < pid_count; j++) {
-                    waitpid(pids[j], NULL, 0);
+                command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
+                processBinaryTree2(startNode->children[i]->left, env, cmd);
+                for (int j = 0; j < cmd->pid_count; j++) {
+                    waitpid(cmd->pids[j], NULL, 0);
                 }
-                free(pids);
+                free(cmd->pids);
+                free(cmd);
             }
             if (i == 0 && startNode->children[i]->right) {
-                int test = dup(STDOUT_FILENO);
-                int test2 = dup(STDIN_FILENO);
-                int max_pids = 1024;
-                int* pids = malloc(max_pids * sizeof(int)); 
-                int pid_count = 0;
-                processBinaryTree2(startNode->children[i]->right, env, test, test2, pids, &pid_count);
-                for (int j = 0; j < pid_count; j++) {
-                    waitpid(pids[j], NULL, 0);
+                command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
+                processBinaryTree2(startNode->children[i]->right, env, cmd);
+                for (int j = 0; j < cmd->pid_count; j++) {
+                    waitpid(cmd->pids[j], NULL, 0);
                 }
-                free(pids);
+                free(cmd->pids);
+                free(cmd);
             }
         }
     }
