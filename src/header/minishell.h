@@ -31,6 +31,13 @@ typedef enum {
     TOKEN_REDIRECTION_APPEND,
 } TokenType;
 
+typedef struct Command {
+    int *pids;
+    int pid_count;
+    int std_in;
+    int std_out;
+} command;
+
 typedef struct Token {
     TokenType type;
     char* value;

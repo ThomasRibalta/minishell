@@ -2,13 +2,6 @@
 
 #include <string.h>
 
-typedef struct Command {
-    int *pids;
-    int pid_count;
-    int std_in;
-    int std_out;
-} command;
-
 int ft_strcmp(char *value1, char *value2) {
     while (*value1 && (*value1 == *value2)) {
         value1++;
@@ -20,12 +13,18 @@ int ft_strcmp(char *value1, char *value2) {
 // Fonction is_builtin pour vérifier si une commande est intégrée
 int is_builtin(char *value) {
     if (!ft_strcmp(value, "cd") ||
-        !ft_strcmp(value, "pwd") ||
         !ft_strcmp(value, "unset") ||
         !ft_strcmp(value, "export") ||
-        !ft_strcmp(value, "echo") ||
-        !ft_strcmp(value, "env") ||
         !ft_strcmp(value, "exit")) {
+        return 1;
+    }
+    return 0;
+}
+
+int is_fork_builtin(char *value) {
+    if (!ft_strcmp(value, "echo") ||
+        !ft_strcmp(value, "env") ||
+        !ft_strcmp(value, "export")) {
         return 1;
     }
     return 0;
@@ -85,69 +84,92 @@ void execute(char **param, char *path, char **env) {
 }
 
 int execute_builtin(ASTNode *node, char **env, char **param){
-  if (ft_strcmp(clean_quote(param[0]), "cd") == 0)
-    exit(0);
-  else if (ft_strcmp(clean_quote(param[0]), "pwd") == 0)
-    printf("%s\n", get_cwd());
-  else if (ft_strcmp(clean_quote(param[0]), "unset") == 0)
-    exit(0);
-  else if (ft_strcmp(clean_quote(param[0]), "echo") == 0)
-    echo(param);
-  else if (ft_strcmp(clean_quote(param[0]), "export") == 0)
-    exit(0);
-  else if (ft_strcmp(clean_quote(param[0]), "env") == 0)
-    print_env(env);
-  else 
-    return 1;
-  exit(0);
+    if (ft_strcmp(clean_quote(param[0]), "exit") == 0)
+        exit_program();
+    else if (ft_strcmp(clean_quote(param[0]), "cd") == 0)
+        cd(param + 1);
+    else if (ft_strcmp(clean_quote(param[0]), "export") == 0 && param[1] != NULL)
+        export_var(&env, param + 1);
+    else if (ft_strcmp(clean_quote(param[0]), "unset") == 0)
+        unset_var(&env, param + 1);
+    else 
+        return 1;
+    return 0;
 }
 
-// Fonction pour exécuter un nœud de l'arbre syntaxique abstrait (AST)
-void exec(ASTNode* node, char **env, command *cmd) {
+int execute_fork_builtin(ASTNode *node, char **env, char **param){
+    if (ft_strcmp(clean_quote(param[0]), "echo") == 0)
+        echo(param + 1);
+    else if (ft_strcmp(clean_quote(param[0]), "env") == 0)
+        print_env(env);
+    else if (ft_strcmp(clean_quote(param[0]), "export") == 0)
+        print_env(env);
+    else 
+        return 1;
+    exit(0);
+}
+
+void handle_child_process(ASTNode* node, command *cmd, int p_id[2], char **split_nodeValue, char **env) {
+    if (!(node->is_last_command))
+    {
+        dup2(p_id[1], STDOUT_FILENO);
+        close(p_id[0]);
+    }
+    else
+    {
+        dup2(cmd->std_out, STDOUT_FILENO);
+        close(cmd->std_out);
+    }
+    if (is_fork_builtin(clean_quote(split_nodeValue[0])))
+    {
+        execute_fork_builtin(node, env, split_nodeValue);
+        exit(EXIT_SUCCESS);
+    }
+    execute(split_nodeValue, get_path(env), env);
+}
+
+void handle_parent_process(ASTNode* node, command *cmd, int p_id[2], pid_t pid) {
+    if (!(node->is_last_command))
+    {
+        dup2(p_id[0], STDIN_FILENO);
+        close(p_id[1]);
+    } 
+    else 
+    {
+        dup2(cmd->std_in, STDIN_FILENO);
+        close(cmd->std_in);
+    }
+    cmd->pids[cmd->pid_count] = pid;
+    (cmd->pid_count)++;
+}
+
+void execute_command(ASTNode* node, char **env, command *cmd) {
     char **split_nodeValue;
     int p_id[2];
     pid_t pid;
-    if (node == NULL || node->value == NULL) {
+
+    if (node == NULL || node->value == NULL)
+        return;
+    if (pipe(p_id) == -1)
+    {
+        perror("pipe");
+        exit(EXIT_FAILURE);
+    }
+    split_nodeValue = ft_split(node->value, ' ');
+    if (is_builtin(clean_quote(split_nodeValue[0])))
+    {
+        execute_builtin(node, env, split_nodeValue);
         return ;
     }
-    if (pipe(p_id) == -1)
-        exit(0);
-    split_nodeValue = ft_split(node->value, ' ');
-    if (ft_strcmp(clean_quote(split_nodeValue[0]), "exit") == 0)
-        exit_program();
-    else if (ft_strcmp(clean_quote(split_nodeValue[0]), "cd") == 0)
-        cd(split_nodeValue + 1);
-    else if (ft_strcmp(clean_quote(split_nodeValue[0]), "export") == 0)
-        export_var(&env, split_nodeValue + 1);
-    else if (ft_strcmp(clean_quote(split_nodeValue[0]), "unset") == 0)
-        unset_var(&env, split_nodeValue + 1);
     pid = fork();
     if (pid == -1) {
         perror("fork");
-        return;
+        exit(EXIT_FAILURE);
     }
-    if (pid == 0) {
-        if (!(node->is_last_command)) {
-            dup2(p_id[1], 1);
-            close(p_id[0]);
-        } else {
-            dup2(cmd->std_out, 1);
-            close(cmd->std_out);
-        }
-        if (is_builtin(clean_quote(split_nodeValue[0])))
-          execute_builtin(node, env, split_nodeValue);
-        execute(split_nodeValue, get_path(env), env);
-    } else {
-        if (!(node->is_last_command)) {
-            dup2(p_id[0], 0);
-            close(p_id[1]);
-        } else {
-            dup2(cmd->std_in, STDIN_FILENO);
-            close(cmd->std_in);
-        }
-        cmd->pids[cmd->pid_count] = pid;
-        (cmd->pid_count)++;
-    }
+    if (pid == 0)
+        handle_child_process(node, cmd, p_id, split_nodeValue, env);
+    else
+        handle_parent_process(node, cmd, p_id, pid);
 }
 
 // Fonction récursive pour traiter les nœuds de l'arbre syntaxique abstrait (AST)
@@ -155,7 +177,7 @@ void processBinaryTree2(ASTNode* node, char **env, command *cmd) {
     if (node == NULL) return;
     processBinaryTree2(node->left, env, cmd);
     if (node->type == NODE_COMMAND) {
-        exec(node, env, cmd);
+        execute_command(node, env, cmd);
     }
     processBinaryTree2(node->right, env, cmd);
 }
@@ -169,35 +191,37 @@ command *init_command(int test, int test2) {
     return cmd;
 }
 
+void    free_command(command *cmd)
+{
+    for (int j = 0; j < cmd->pid_count; j++)
+        waitpid(cmd->pids[j], NULL, 0);
+    free(cmd->pids);
+    free(cmd);
+}
+
 // Fonction pour étendre les arbres de commandes et les exécuter
 void expandCommandTrees2(StartNode* startNode, char **env) {
-    if (!startNode->hasLogical) {
+    if (!startNode->hasLogical) 
+    {
         command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
         processBinaryTree2(startNode->children[0]->left, env, cmd);
-        for (int i = 0; i < cmd->pid_count; i++) {
-            waitpid(cmd->pids[i], NULL, 0);
-        }
-        free(cmd->pids);
-        free(cmd);
-    } else {
-        for (int i = 0; i < startNode->childCount; i++) {
-            if (startNode->children[i]->left) {
+        free_command(cmd);
+    } 
+    else 
+    {
+        for (int i = 0; i < startNode->childCount; i++) 
+        {
+            if (startNode->children[i]->left) 
+            {
                 command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
                 processBinaryTree2(startNode->children[i]->left, env, cmd);
-                for (int j = 0; j < cmd->pid_count; j++) {
-                    waitpid(cmd->pids[j], NULL, 0);
-                }
-                free(cmd->pids);
-                free(cmd);
+                free_command(cmd);
             }
-            if (i == 0 && startNode->children[i]->right) {
+            if (i == 0 && startNode->children[i]->right) 
+            {
                 command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
                 processBinaryTree2(startNode->children[i]->right, env, cmd);
-                for (int j = 0; j < cmd->pid_count; j++) {
-                    waitpid(cmd->pids[j], NULL, 0);
-                }
-                free(cmd->pids);
-                free(cmd);
+                free_command(cmd);
             }
         }
     }
