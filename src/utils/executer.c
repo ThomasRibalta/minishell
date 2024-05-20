@@ -2,6 +2,54 @@
 
 #include <string.h>
 
+void open_create_output_file(ASTNode *node) {
+    if (node->outputs)
+    {
+        while (node->outputs) {
+            int fd = open(node->outputs->filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+            if (fd == -1) {
+                perror("open");
+                exit(EXIT_FAILURE);
+            }
+            dup2(fd, STDOUT_FILENO);
+            close(fd);
+            node->outputs = node->outputs->next;
+        }
+    }
+    if (node->appends)
+    {
+        while (node->appends)
+        {
+            int fd = open(node->appends->filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
+            if (fd == -1)
+            {
+                perror("open");
+                exit(EXIT_FAILURE);
+            }
+            dup2(fd, STDOUT_FILENO);
+            close(fd);
+            node->appends = node->appends->next;
+        }
+    }
+}
+
+void lire_contenu_pipe(int fd, ASTNode *node) {
+    char buffer[1024];
+    ssize_t bytes_read;
+
+    while ((bytes_read = read(fd, buffer, sizeof(buffer) - 1)) > 0) {
+        // Ajouter un caractère nul pour rendre la chaîne de caractères
+        buffer[bytes_read] = '\0';
+        // Afficher le contenu lu
+        printf("%s", buffer);
+    }
+
+    if (bytes_read == -1) {
+        perror("Erreur de lecture du pipe");
+        exit(EXIT_FAILURE);
+    }
+}
+
 int ft_strcmp(char *value1, char *value2) {
     while (*value1 && (*value1 == *value2)) {
         value1++;
@@ -113,11 +161,13 @@ void handle_child_process(ASTNode* node, command *cmd, int p_id[2], char **split
     if (!(node->is_last_command))
     {
         dup2(p_id[1], STDOUT_FILENO);
+        open_create_output_file(node);
         close(p_id[0]);
     }
     else
     {
         dup2(cmd->std_out, STDOUT_FILENO);
+        open_create_output_file(node);
         close(cmd->std_out);
     }
     if (is_fork_builtin(clean_quote(split_nodeValue[0])))
@@ -143,10 +193,23 @@ void handle_parent_process(ASTNode* node, command *cmd, int p_id[2], pid_t pid) 
     (cmd->pid_count)++;
 }
 
+
+void redirection_in(char *filename)
+{
+    int fd = open(filename, O_RDONLY);
+    if (fd == -1)
+    {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
+    dup2(fd, STDIN_FILENO);
+    close(fd);
+}
 void execute_command(ASTNode* node, char **env, command *cmd) {
     char **split_nodeValue;
     int p_id[2];
     pid_t pid;
+    int fd;
 
     if (node == NULL || node->value == NULL)
         return;
@@ -155,6 +218,8 @@ void execute_command(ASTNode* node, char **env, command *cmd) {
         perror("pipe");
         exit(EXIT_FAILURE);
     }
+    if (node->inputs)
+        redirection_in(node->inputs->filename);
     split_nodeValue = ft_split(node->value, ' ');
     if (is_builtin(clean_quote(split_nodeValue[0])))
     {
@@ -167,12 +232,13 @@ void execute_command(ASTNode* node, char **env, command *cmd) {
         exit(EXIT_FAILURE);
     }
     if (pid == 0)
+    {
         handle_child_process(node, cmd, p_id, split_nodeValue, env);
+    }
     else
         handle_parent_process(node, cmd, p_id, pid);
 }
 
-// Fonction récursive pour traiter les nœuds de l'arbre syntaxique abstrait (AST)
 void processBinaryTree2(ASTNode* node, char **env, command *cmd) {
     if (node == NULL) return;
     processBinaryTree2(node->left, env, cmd);
@@ -199,7 +265,6 @@ void    free_command(command *cmd)
     free(cmd);
 }
 
-// Fonction pour étendre les arbres de commandes et les exécuter
 void expandCommandTrees2(StartNode* startNode, char **env) {
     if (!startNode->hasLogical) 
     {
