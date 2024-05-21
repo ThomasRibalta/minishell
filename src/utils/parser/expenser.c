@@ -55,7 +55,7 @@ void expandCommandTrees(StartNode* startNode, void (*processStr)(char**)) {
 
 
 void printCommandNode(char **str) {
-	printf("%s\n", *str);
+	printf("%s|\n", *str);
 }
 
 void is_last_command_btree(ASTNode* node) {

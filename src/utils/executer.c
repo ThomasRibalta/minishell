@@ -112,7 +112,6 @@ int execute_fork_builtin(ASTNode *node, char **env, char **param){
 void handle_child_process(ASTNode* node, command *cmd, int p_id[2], char **split_nodeValue, char **env, int fd) {
     if (!(node->is_last_command) || node->outputs != NULL || node->appends != NULL)
     {
-        //printf("p_id[2]=%d, fd=%d\n", p_id[1], fd);
         dup2(fd, STDOUT_FILENO);
         close(p_id[0]);
     }
@@ -192,7 +191,7 @@ void execute_command(ASTNode* node, char **env, command *cmd, int fd) {
         handle_parent_process(node, cmd, p_id, pid);
 }
 
-void execute_parenthese(ASTNode* node, char **env) {
+void execute_parenthese(ASTNode* node, char **env, int fd, command *cmd) {
     int p_id[2];
     pid_t pid;
 
@@ -200,25 +199,44 @@ void execute_parenthese(ASTNode* node, char **env) {
         perror("pipe");
         exit(EXIT_FAILURE);
     }
+    if (fd == -1)
+        fd = p_id[1];
+    if (node->inputs)
+        redirection_in(node->inputs->filename);
     pid = fork();
     if (pid == -1) {
         perror("fork");
         exit(EXIT_FAILURE);
     }
     if (pid == 0) {
-        close(p_id[0]);
-        dup2(p_id[1], STDOUT_FILENO);
-        //open_create_output_file(node);
+        if (!(node->is_last_command) || node->outputs != NULL || node->appends != NULL)
+        {
+            dup2(fd, STDOUT_FILENO);
+            close(p_id[0]);
+        }
+        else
+        {
+            dup2(cmd->std_out, STDOUT_FILENO);
+            close(cmd->std_out);
+        }
         lexer(ft_substr(node->value, 1, ft_strlen(node->value) - 2), env);
         exit(EXIT_SUCCESS);
     } else {
         waitpid(pid, NULL, 0);
-        close(p_id[1]);
-        dup2(p_id[0], STDIN_FILENO);
+        if (!(node->is_last_command))
+        {
+            dup2(p_id[0], STDIN_FILENO);
+            close(p_id[1]);
+        } 
+        else 
+        {
+            dup2(cmd->std_in, STDIN_FILENO);
+            close(cmd->std_in);
+        }
     }
 }
 
-void execute_output_append(ASTNode* node, char **env, command *cmd) {
+void execute_output_append_command(ASTNode* node, char **env, command *cmd) {
     if (node->outputs){
         while (node->outputs) {
             int fd = open(node->outputs->filename, O_WRONLY | O_CREAT, 0644);
@@ -226,7 +244,6 @@ void execute_output_append(ASTNode* node, char **env, command *cmd) {
                 perror("open");
                 exit(EXIT_FAILURE);
             }
-            //printf("fd = %d\n", fd);
             execute_command(node, env, cmd, fd);
             close(fd);
             node->outputs = node->outputs->next;
@@ -249,12 +266,40 @@ void execute_output_append(ASTNode* node, char **env, command *cmd) {
         execute_command(node, env, cmd, -1);
 }
 
+void execute_output_append_parenthese(ASTNode* node, char **env, command *cmd) {
+    if (node->outputs) {
+        while (node->outputs) {
+            int fd = open(node->outputs->filename, O_WRONLY | O_CREAT, 0644);
+            if (fd == -1) {
+                perror("open");
+                exit(EXIT_FAILURE);
+            }
+            execute_parenthese(node, env, fd, cmd);
+            close(fd);
+            node->outputs = node->outputs->next;
+        }
+    }
+    if (node->appends) {
+        while (node->appends) {
+            int fd = open(node->appends->filename, O_WRONLY | O_APPEND | O_CREAT, 0644);
+            if (fd == -1) {
+                perror("open");
+                exit(EXIT_FAILURE);
+            }
+            execute_parenthese(node, env, fd, cmd);
+            close(fd);
+            node->appends = node->appends->next;
+        }
+    }
+    execute_parenthese(node, env, -1, cmd);
+}
+
 void processBinaryTree2(ASTNode* node, char **env, command *cmd) {
     if (node == NULL) return;
     processBinaryTree2(node->left, env, cmd);
     if (node->type == NODE_COMMAND) {
         if (node->outputs || node->appends)
-            execute_output_append(node, env, cmd);
+            execute_output_append_command(node, env, cmd);
         else
         {
            // printf("node->value = %s\n", node->value);
@@ -262,7 +307,7 @@ void processBinaryTree2(ASTNode* node, char **env, command *cmd) {
         }
     }
     if (node->type == NODE_PARENTHESE) {
-        execute_parenthese(node, env);
+        execute_output_append_parenthese(node, env, cmd);
     }
     processBinaryTree2(node->right, env, cmd);
 }
