@@ -82,19 +82,14 @@ int in_special_zone(char *input, int i)
         {
             if (!open_double_quote && !open_single_quote) 
             {
-                if (!open_parenthesis)
                     open_parenthesis++;
-                else
-                    open_parenthesis--;
             }
         }
         else if (input[j] == ')') 
         {
             if (!open_double_quote && !open_single_quote) 
             {
-                if (!open_parenthesis)
-                    open_parenthesis++;
-                else
+                if (open_parenthesis)
                     open_parenthesis--;
             }
         }

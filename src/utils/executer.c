@@ -156,6 +156,217 @@ void redirection_in(char *filename)
     close(fd);
 }
 
+int get_number_of_files()
+{
+    int n;
+    DIR *dir;
+    struct dirent *entry;
+
+    n = 0;
+    dir = opendir(".");
+    if (!dir)
+    {
+        perror("diropen");
+        exit(EXIT_FAILURE);
+    }
+    while ((entry = readdir(dir)) != NULL)
+    {
+        if (entry->d_name[0] == '.' && (entry->d_name[1] == '\0' || (entry->d_name[1] == '.' && entry->d_name[2] == '\0'))) {
+            continue;
+        }
+        n++;
+    }
+    closedir(dir);
+    return n;
+}
+
+char **get_current_file()
+{
+    char **tab;
+    int n;
+    int i;
+    DIR *dir;
+    struct dirent *entry;
+
+    n = get_number_of_files();
+    i = 0;
+    tab = malloc(sizeof(char *) * (n + 1));
+    if (!tab)
+    {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
+    dir = opendir(".");
+    if (!dir)
+    {
+        perror("diropen");
+        exit(EXIT_FAILURE);
+    }
+    while ((entry = readdir(dir)) != NULL)
+    {
+        if (entry->d_name[0] == '.' && (entry->d_name[1] == '\0' || (entry->d_name[1] == '.' && entry->d_name[2] == '\0')) || entry->d_name[0] == '.') {
+            continue;
+        }
+        tab[i] = strdup(entry->d_name);
+        i++;
+    }
+    closedir(dir);
+    tab[n] = NULL;
+    return (tab);
+}
+
+int word_at_end(char *value1, char *value2) {
+    int len1;
+    len1 = strlen(value1);
+    int len2;
+    len2 = strlen(value2);
+
+    if (len2 > len1)
+        return 0;
+    return (strcmp(value1 + len1 - len2, value2) == 0) ? 1 : 0;
+}
+
+
+int word_at_start(char *value1, char *value2) {
+    int len2 = strlen(value2);
+
+    return (strncmp(value1, value2, len2) == 0) ? 1 : 0;
+}
+
+int process_tab_current_file(char **tab_current_file, char **tab, int i, int pos, int j)
+{
+    int n = 0;
+    int count = 0;
+
+    while (tab_current_file[n])
+    {
+        if (pos == 1)
+        {
+            if (word_at_end(tab_current_file[n], tab[i] + 1))
+                count++;
+        }
+        else if (pos == 2)
+        {
+            if (word_at_start(tab_current_file[n], tab[i] + 1) && ft_strlen(tab[i]) > 1)
+                count++;
+            else
+                count++;
+            
+        }
+        else if (pos == 3)
+        {
+            if (word_at_end(tab_current_file[n], tab[i] + j + 1) && word_at_start(tab_current_file[n], ft_substr(tab[i], 0, j)))
+                count++;
+        }
+        n++;
+    }
+    return (count);
+}
+
+int tab_len(char **tab)
+{
+    int i = 0;
+
+    while (tab[i])
+    {
+        i++;
+    }
+    return (i);
+}
+
+char **replace_wildcard(char **tab, int i, int pos, int j)
+{
+    char **tab_current_file;
+    int n = 1;
+    int m = 1;
+
+    tab_current_file = get_current_file();
+    int k = process_tab_current_file(tab_current_file, tab, i, pos, j);
+    char **new_tab = malloc(sizeof(char *) * (k + 1 + tab_len(tab)));
+    new_tab[0] = tab[0];
+    while (tab[m])
+    {
+        if (m  == i && tab[m + 1])
+            m++;
+        else if (m == i && !tab[m + 1])
+            break;
+        new_tab[n] = strdup(tab[m]);
+        n++;
+        m++;
+    }
+    m = 0;
+    while (tab_current_file[m])
+    {
+        if (pos == 1)
+        {
+            if (word_at_end(tab_current_file[m], tab[i] + 1))
+            {
+                new_tab[n] = strdup(tab_current_file[m]);
+                n++;
+            }
+        }
+        else if (pos == 2)
+        {
+            if (word_at_start(tab_current_file[m], tab[i] + 1) && ft_strlen(tab[m]) > 1)
+            {
+                new_tab[n] = strdup(tab_current_file[m]);
+                n++;
+            }
+            else
+            {
+                new_tab[n] = strdup(tab_current_file[m]);
+                n++;
+            }
+            
+        }
+        else if (pos == 3)
+        {
+            if (word_at_end(tab_current_file[m], tab[i] + j + 1) && word_at_start(tab_current_file[m], ft_substr(tab[i], 0, j)))
+            {
+                new_tab[n] = strdup(tab_current_file[m]);
+                n++;
+            }
+        }
+        m++;
+    }
+    new_tab[n] = NULL;
+    return (new_tab);
+}
+
+char **check_wildcard(char **split_nodeValue)
+{
+    int i = 0;
+    int j = 0;
+    int pos = 0;
+    char **tab_current_file;
+
+    while (split_nodeValue[i])
+    {
+        while(split_nodeValue[i][j])
+        {
+            if (split_nodeValue[i][j] == '*' && j == 0)
+            {
+                tab_current_file = replace_wildcard(split_nodeValue, i, 1, j);
+                break;
+            }
+            else if (split_nodeValue[i][j] == '*' && split_nodeValue[i][j + 1] == '\n')
+            {
+                tab_current_file = replace_wildcard(split_nodeValue, i, 2, j);
+                break;
+            }
+            else if (split_nodeValue[i][j] == '*')
+            {
+                tab_current_file = replace_wildcard(split_nodeValue, i, 3, j);
+                break;
+            }
+            j++;
+        }
+        j = 0;
+        i++;
+    }
+    return (tab_current_file);
+}
+
 void execute_command(ASTNode* node, char **env, command *cmd, int fd) {
     char **split_nodeValue;
     int p_id[2];
@@ -173,6 +384,7 @@ void execute_command(ASTNode* node, char **env, command *cmd, int fd) {
     if (node->inputs)
         redirection_in(node->inputs->filename);
     split_nodeValue = ft_split(node->value, ' ');
+    split_nodeValue = check_wildcard(split_nodeValue);
     if (is_builtin(clean_quote(split_nodeValue[0])))
     {
         execute_builtin(node, env, split_nodeValue);

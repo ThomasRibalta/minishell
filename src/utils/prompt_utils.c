@@ -10,7 +10,7 @@ char *clean_white_space(char *input)
     j = ft_strlen(input);
     while (input[i] != '\0' && (!ft_isascii(input[i]) || input[i] == ' '))
         i++;
-    while (!ft_isascii(input[j-1]) && j != 0)
+    while ((!ft_isascii(input[j - 1]) || input[j - 1] == ' ') && j != 0)
         j--;
     clean_input = malloc((j - i + 1) * sizeof(char));
     if (!clean_input)

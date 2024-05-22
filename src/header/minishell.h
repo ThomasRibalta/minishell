@@ -9,6 +9,7 @@
 # include <stdlib.h>
 # include <string.h>
 # include <signal.h>
+# include <dirent.h>
 # include <sys/wait.h>
 # include <unistd.h>
 # include <stdbool.h>
