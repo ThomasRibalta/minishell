@@ -514,7 +514,6 @@ void processBinaryTree2(ASTNode* node, char **env, command *cmd) {
             execute_output_append_command(node, env, cmd);
         else
         {
-           // printf("node->value = %s\n", node->value);
             execute_command(node, env, cmd, -1);
         }
     }
