@@ -13,7 +13,7 @@
 #include "libft.h"
 #include <stdio.h>
 
-static int in_special_zone(char *input, int i) 
+int in_special_zone(char *input, int i) 
 {
     int j;
     int open_double_quote;
@@ -63,8 +63,13 @@ static int in_special_zone(char *input, int i)
         }
         j++;
     }
-
-    return (open_double_quote || open_single_quote || open_parenthesis);
+		if (open_double_quote)
+			return (1);
+		if (open_single_quote)
+			return (2);
+		if (open_parenthesis)
+			return (3);
+		return (0);
 }
 
 static int	ft_allocate(char **tab, char const *s, char sep, size_t *h_error)

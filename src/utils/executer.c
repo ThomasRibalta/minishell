@@ -569,5 +569,7 @@ void expandCommandTrees2(StartNode* startNode, char **env) {
 
 // Fonction principale pour exécuter le nœud de départ
 void executer(StartNode* startNode, char **env) {
+    global_sig = 1;
     expandCommandTrees2(startNode, env);
+    global_sig = 0;
 }

@@ -53,6 +53,7 @@ char	*ft_strcpy(char *dest, const char *src);
 char	*ft_strrchr(const char *str, int c);
 int		ft_strncmp(const char *str1, const char *str2, size_t n);
 int		ft_strncmp_gnl(const char *s1, const char *s2, size_t n);
+int		in_special_zone(char *input, int i);
 int		ft_strnchr(const char *str, int c);
 char	*ft_strnstr(const char *big, const char *little, size_t len);
 int		ft_atoi(const char *nptr);

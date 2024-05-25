@@ -261,7 +261,7 @@ void parser(Token *tokens, char **env) {
 
     //printEntireAST(startNode);
 
-	expenser(startNode);
+	expenser(startNode, env);
     executer(startNode, env);
 
 	//printf("%s\n", startNode->children[0]->left->left->value);

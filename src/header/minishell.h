@@ -87,7 +87,7 @@ typedef struct StartNode {
     bool hasLogical; // Boolean to indicate if there are logical nodes
 } StartNode;
 
-
+int global_sig;
 
 void	init_terminal(char **env);
 void	edit_shlvl(char **env);
@@ -115,7 +115,7 @@ void	free_lexer(Token **lexer);
 void executer(StartNode* startNode, char **env);
 void printEntireAST(const StartNode* startNode);
 void freeRedirectionList(Redirection** list);
-void expenser(StartNode* startNode);
+void expenser(StartNode* startNode, char **env);
 
 
 #endif

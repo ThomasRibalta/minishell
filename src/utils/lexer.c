@@ -45,60 +45,6 @@ void printTokens(const Token* head) {
     }
 }
 
-int in_special_zone(char *input, int i) 
-{
-    int j;
-    int open_double_quote;
-    int open_single_quote;
-    int open_parenthesis;
-
-    j = 0;
-    open_double_quote = 0;
-    open_single_quote = 0;
-    open_parenthesis = 0;
-    while (input[j] && j != i)
-    {
-        if (input[j] == '"') 
-        {
-            if (!open_single_quote && !open_parenthesis) 
-            {
-                if (!open_double_quote)
-                    open_double_quote++;
-                else
-                    open_double_quote--;
-            }
-        } 
-        else if (input[j] == '\'') 
-        {
-            if (!open_double_quote && !open_parenthesis) 
-            {
-                if (!open_single_quote)
-                    open_single_quote++;
-                else
-                    open_single_quote--;
-            }
-        }
-        else if (input[j] == '(') 
-        {
-            if (!open_double_quote && !open_single_quote) 
-            {
-                    open_parenthesis++;
-            }
-        }
-        else if (input[j] == ')') 
-        {
-            if (!open_double_quote && !open_single_quote) 
-            {
-                if (open_parenthesis)
-                    open_parenthesis--;
-            }
-        }
-        j++;
-    }
-
-    return (open_double_quote || open_single_quote || open_parenthesis);
-}
-
 int is_separator(char *s, int i) {
     if ((s[i] == '|' && s[i + 1] == '|') || (s[i] == '&' && s[i + 1] == '&'))
         return 1;
@@ -172,7 +118,7 @@ int	ft_strlenc(char *str)
 		i++;
 	return (i);
 }
-char	*get_word(char *str)
+static char	*get_word(char *str)
 {
 	char	*word;
 	int		i;
@@ -400,13 +346,13 @@ void lexer(char *input, char **env)
     char **tab_input;
     Token *list = NULL;
 
+    if (ft_strlen(input) == 0)
+        return ;
     tab_input = split_prompt(input);
-    //aff_table(tab_input);
     tab_input = tab_clean(tab_input);
-    if(!check_error_tab(tab_input)) return ;
+    if(!check_error_tab(tab_input))
+        return ;
     chained_split_prompt(&list, tab_input);
-    //printf("\n-=-=Liste Chainée=-=-\n");
-    //printTokens(list);
     parser(list, env);
     freeTokens(list);
 }

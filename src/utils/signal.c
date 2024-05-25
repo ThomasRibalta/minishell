@@ -9,7 +9,7 @@ void    init_mask(struct sigaction *sig)
 
 void signal_handler(int signum, siginfo_t *siginfo, void *context) 
 {
-    if (signum == SIGINT)
+    if (signum == SIGINT && global_sig == 0)
     {
         write(1,"\n", 2);
         write(1, ft_strjoin(ft_strjoin(VERT"→ "BLEU, get_cwd()), VIOLET" > "RESET), 
