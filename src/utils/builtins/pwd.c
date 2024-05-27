@@ -1,6 +1,6 @@
 #include "../../header/minishell.h"
 
-char *get_cwd()
+char *get_cwd(int i)
 {
     char *cwd;
     
@@ -9,17 +9,9 @@ char *get_cwd()
         return ("Erreur");
     if (!getcwd(cwd, 1024))
         return ("Erreur");
-    if (!ft_strncmp(cwd, getenv("HOME"), ft_strlen(cwd)))
+    if (i == 1 && ft_strlen(cwd) >= ft_strlen(getenv("HOME")))
     {
-        free(cwd);
-        cwd = malloc(2 * sizeof(char));
-        if (!cwd)
-            return ("Erreur");
-        else
-        {
-            cwd[0] = '~';
-            cwd[1] = '\0';
-        }
+        cwd = ft_strjoin("~", cwd + ft_strlen(getenv("HOME")));
     }
     return (cwd);
 }

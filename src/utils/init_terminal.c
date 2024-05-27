@@ -56,13 +56,13 @@ void start_terminal(int ac, char **av, char **env)
     
     while (1) 
     {
-        input = readline(ft_strjoin(ft_strjoin(VERT"→ "BLEU, get_cwd()), VIOLET" > "RESET));
+        input = readline(ft_strjoin(ft_strjoin(VERT"→ "BLEU, get_cwd(1)), VIOLET" > "RESET));
         if (!input) 
         {
             printf(VIOLET"\n\n FERMETURE DU TERMINAL, A LA PROCHAINE !! \n\n");
             exit(1);
         }
         add_history(input);
-        check_prompt(input, env);
+        check_prompt(input, &env);
     }
 }

@@ -1,7 +1,8 @@
 #include "../../header/minishell.h"
 
-void exit_program()
+void exit_program(char *value)
 {
-    // voir si des choses a free
-    exit(0);
+    if (value == NULL)
+        exit(0);
+    exit(ft_atoi(value));
 }

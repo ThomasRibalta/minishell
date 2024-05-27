@@ -140,8 +140,8 @@ void replaceEnvVars(char **str, char **env)
     *str = tmp;
 }
 
-void expenser(StartNode* startNode, char **env)
+void expenser(StartNode* startNode, char ***env)
 {
-	expandCommandTrees(startNode, replaceEnvVars, env);
+	//expandCommandTrees(startNode, replaceEnvVars, env);
 	is_last_command(startNode);
 }

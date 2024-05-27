@@ -341,7 +341,7 @@ int check_error_tab(char **tab_input){
     return (1);
 }
 
-void lexer(char *input, char **env)
+void lexer(char *input, char ***env)
 {
     char **tab_input;
     Token *list = NULL;

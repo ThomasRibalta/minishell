@@ -253,7 +253,7 @@ void generateAndAttachBTree(StartNode* startNode, Token* tokens) {
     }
 }
 
-void parser(Token *tokens, char **env) {
+void parser(Token *tokens, char ***env) {
     //Token *tokens = lexer();
     StartNode *startNode = createAndSetupStartNode(tokens);
     addLogicalNodeToStartNode(startNode, tokens);

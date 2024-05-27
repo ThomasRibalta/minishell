@@ -51,7 +51,6 @@ void export_var(char ***env, char **tab)
     i = 0;
     while(tab[i])
     {
-        printf("tab[%d] = %s\n", i, tab[i]);
         if (!ft_strchr(tab[i], '='))
         {
             export_var2(env, tab[i], "");

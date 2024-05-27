@@ -42,6 +42,8 @@ char *check_path(char **paths, char *name) {
     char *join;
     char *tmp;
     int i = 0;
+    if (name[0] == '.' && name[1] == '/')
+        return (name);
     while (paths[i]) {
         tmp = ft_strjoin(paths[i], "/");
         join = ft_strjoin(tmp, name);
@@ -71,27 +73,26 @@ void execute(char **param, char *path, char **env) {
     paths = ft_split(path, ':');
     path1 = check_path(paths, clean_quote(param[0]));
     if (!path1) {
-        //free_all(paths);
-        //free_all(param);
+        printf("minishell: %s: command not found\n", param[0]);
+        free_all(paths);
+        exit(EXIT_FAILURE);
     }
     if (execve(path1, param, env) == -1) {
-        //free_all(paths);
-        //free_all(param);
+        free_all(paths);
     }
-    //free_all(paths);
-    //free_all(param);
-    //free(path1);
+    free(path1);
+    exit(EXIT_FAILURE);
 }
 
-int execute_builtin(ASTNode *node, char **env, char **param){
+int execute_builtin(ASTNode *node, char ***env, char **param){
     if (ft_strcmp(clean_quote(param[0]), "exit") == 0)
-        exit_program();
+        exit_program(param[1]);
     else if (ft_strcmp(clean_quote(param[0]), "cd") == 0)
-        cd(param + 1);
+        cd(param + 1, env);
     else if (ft_strcmp(clean_quote(param[0]), "export") == 0 && param[1] != NULL)
-        export_var(&env, param + 1);
+        export_var(env, param + 1);
     else if (ft_strcmp(clean_quote(param[0]), "unset") == 0)
-        unset_var(&env, param + 1);
+        unset_var(env, param + 1);
     else 
         return 1;
     return 0;
@@ -109,7 +110,7 @@ int execute_fork_builtin(ASTNode *node, char **env, char **param){
     exit(0);
 }
 
-void handle_child_process(ASTNode* node, command *cmd, int p_id[2], char **split_nodeValue, char **env, int fd) {
+void handle_child_process(ASTNode* node, command *cmd, int p_id[2], char **split_nodeValue, char ***env, int fd) {
     if (!(node->is_last_command) || node->outputs != NULL || node->appends != NULL)
     {
         dup2(fd, STDOUT_FILENO);
@@ -122,10 +123,10 @@ void handle_child_process(ASTNode* node, command *cmd, int p_id[2], char **split
     }
     if (is_fork_builtin(clean_quote(split_nodeValue[0])))
     {
-        execute_fork_builtin(node, env, split_nodeValue);
+        execute_fork_builtin(node, *env, split_nodeValue);
         exit(EXIT_SUCCESS);
     }
-    execute(split_nodeValue, get_path(env), env);
+    execute(split_nodeValue, get_path(*env), *env);
 }
 
 void handle_parent_process(ASTNode* node, command *cmd, int p_id[2], pid_t pid) {
@@ -367,7 +368,7 @@ char **check_wildcard(char **split_nodeValue)
     return (tab_current_file);
 }
 
-void execute_command(ASTNode* node, char **env, command *cmd, int fd) {
+void execute_command(ASTNode* node, char ***env, command *cmd, int fd) {
     char **split_nodeValue;
     int p_id[2];
     pid_t pid;
@@ -383,12 +384,13 @@ void execute_command(ASTNode* node, char **env, command *cmd, int fd) {
         fd = p_id[1];
     if (node->inputs)
         redirection_in(node->inputs->filename);
+    replaceEnvVars(&node->value, *env);
     split_nodeValue = ft_split(node->value, ' ');
     split_nodeValue = check_wildcard(split_nodeValue);
     if (is_builtin(clean_quote(split_nodeValue[0])))
     {
         execute_builtin(node, env, split_nodeValue);
-        return ;
+        return;
     }
     pid = fork();
     if (pid == -1) {
@@ -403,7 +405,7 @@ void execute_command(ASTNode* node, char **env, command *cmd, int fd) {
         handle_parent_process(node, cmd, p_id, pid);
 }
 
-void execute_parenthese(ASTNode* node, char **env, int fd, command *cmd) {
+void execute_parenthese(ASTNode* node, char ***env, int fd, command *cmd) {
     int p_id[2];
     pid_t pid;
 
@@ -448,7 +450,7 @@ void execute_parenthese(ASTNode* node, char **env, int fd, command *cmd) {
     }
 }
 
-void execute_output_append_command(ASTNode* node, char **env, command *cmd) {
+void execute_output_append_command(ASTNode* node, char ***env, command *cmd) {
     if (node->outputs){
         while (node->outputs) {
             int fd = open(node->outputs->filename, O_WRONLY | O_CREAT, 0644);
@@ -478,7 +480,7 @@ void execute_output_append_command(ASTNode* node, char **env, command *cmd) {
         execute_command(node, env, cmd, -1);
 }
 
-void execute_output_append_parenthese(ASTNode* node, char **env, command *cmd) {
+void execute_output_append_parenthese(ASTNode* node, char ***env, command *cmd) {
     if (node->outputs) {
         while (node->outputs) {
             int fd = open(node->outputs->filename, O_WRONLY | O_CREAT, 0644);
@@ -506,7 +508,7 @@ void execute_output_append_parenthese(ASTNode* node, char **env, command *cmd) {
     execute_parenthese(node, env, -1, cmd);
 }
 
-void processBinaryTree2(ASTNode* node, char **env, command *cmd) {
+void processBinaryTree2(ASTNode* node, char ***env, command *cmd) {
     if (node == NULL) return;
     processBinaryTree2(node->left, env, cmd);
     if (node->type == NODE_COMMAND) {
@@ -540,7 +542,7 @@ void    free_command(command *cmd)
     free(cmd);
 }
 
-void expandCommandTrees2(StartNode* startNode, char **env) {
+void expandCommandTrees2(StartNode* startNode, char ***env) {
     if (!startNode->hasLogical) 
     {
         command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
@@ -568,7 +570,7 @@ void expandCommandTrees2(StartNode* startNode, char **env) {
 }
 
 // Fonction principale pour exécuter le nœud de départ
-void executer(StartNode* startNode, char **env) {
+void executer(StartNode* startNode, char ***env) {
     global_sig = 1;
     expandCommandTrees2(startNode, env);
     global_sig = 0;

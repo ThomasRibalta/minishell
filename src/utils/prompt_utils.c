@@ -81,7 +81,7 @@ char *clean_quote(char *input)
     return (input);
 }
 
-char *clean_prompt(char *input, char **env)
+char *clean_prompt(char *input, char ***env)
 {
     char *prompt;
 
@@ -90,7 +90,7 @@ char *clean_prompt(char *input, char **env)
     return (prompt);
 }
 
-void check_prompt(char *input, char **env)
+void check_prompt(char *input, char ***env)
 {
     char *prompt;
 

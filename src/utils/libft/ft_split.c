@@ -91,7 +91,7 @@ static int	ft_allocate(char **tab, char const *s, char sep, size_t *h_error)
 		i = 0;
 		while (tmp[i] && (tmp[i] != sep || in_special_zone((char *)tmp, i)))
 			i++;
-		if (tmp[i] == sep || i > j)
+		if (tmp[i] == sep || i > j || tmp[i] == '\0')
 		{
 			*tab_p = ft_substr(s + j, 0, i);
 			if (!*tab_p)

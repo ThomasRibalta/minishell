@@ -12,8 +12,8 @@ void signal_handler(int signum, siginfo_t *siginfo, void *context)
     if (signum == SIGINT && global_sig == 0)
     {
         write(1,"\n", 2);
-        write(1, ft_strjoin(ft_strjoin(VERT"→ "BLEU, get_cwd()), VIOLET" > "RESET), 
-        ft_strlen(ft_strjoin(ft_strjoin(VERT"→ "BLEU, get_cwd()), VIOLET" > "RESET)));
+        write(1, ft_strjoin(ft_strjoin(VERT"→ "BLEU, get_cwd(1)), VIOLET" > "RESET), 
+        ft_strlen(ft_strjoin(ft_strjoin(VERT"→ "BLEU, get_cwd(1)), VIOLET" > "RESET)));
     }
     else
         return ;
