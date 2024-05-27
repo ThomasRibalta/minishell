@@ -18,6 +18,7 @@
 # define VERT "\e[32m"
 # define BLEU "\e[34m"
 # define RESET "\e[0m"
+# define MY_WEXITSTATUS(status) (((status) & 0xff00) >> 8)
 
 // lexer
 typedef enum {
@@ -93,7 +94,7 @@ void	init_terminal(char **env);
 void	edit_shlvl(char **env);
 void	write_terminal_title(void);
 void	clear_terminal(char **env);
-void  parser(Token *tokens, char ***env);
+void  parser(Token *tokens, char ***env, int *exit_status);
 void print_env(char **env);
 void exit_program(char *value);
 void export_var(char ***env, char **tab);
@@ -101,22 +102,23 @@ char **clone_env(char **env);
 void unset_var(char ***env, char **tab);
 void echo(char **tab);
 void cd(char **tab, char ***env);
-void lexer(char *input, char ***env);
+void lexer(char *input, char ***env, int *exit_status);
 void init_signal();
-void start_terminal(int ac, char **av, char **env);
+void start_terminal(int ac, char **av, char **env, int exit_status);
 char *get_cwd(int i);
 char *clean_white_space(char *input);
 char *clean_quote(char *input);
-char *clean_prompt(char *input, char ***env);
-void check_prompt(char *input, char ***env);
+char *clean_prompt(char *input, char ***env, int *exit_status);
+void check_prompt(char *input, char ***env, int *exit_status);
 char *clean_white_space(char *input);
-void replaceEnvVars(char **str, char **env);
+void replaceEnvVars(char **str, char **env, int *exit_status);
 void	free_lexer(Token **lexer);
-void executer(StartNode* startNode, char ***env);
+void executer(StartNode* startNode, char ***env, int *exit_status);
 void printEntireAST(const StartNode* startNode);
 void freeRedirectionList(Redirection** list);
 void export_var2(char ***env, const char *name, const char *value);
 void expenser(StartNode* startNode, char ***env);
+void unset_var2(char ***env, const char *name);
 
 
 #endif

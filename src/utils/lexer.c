@@ -341,7 +341,7 @@ int check_error_tab(char **tab_input){
     return (1);
 }
 
-void lexer(char *input, char ***env)
+void lexer(char *input, char ***env, int *exit_status)
 {
     char **tab_input;
     Token *list = NULL;
@@ -353,6 +353,6 @@ void lexer(char *input, char ***env)
     if(!check_error_tab(tab_input))
         return ;
     chained_split_prompt(&list, tab_input);
-    parser(list, env);
+    parser(list, env, exit_status);
     freeTokens(list);
 }

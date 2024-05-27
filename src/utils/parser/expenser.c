@@ -92,11 +92,16 @@ int in_env(char *word, char **env)
     return (0);
 }
 
-char *get_env_value(char *word, char **env)
+char *get_env_value(char *word, char **env , int *exit_status)
 {
     int i = 0;
     while (env[i])
     {
+        if (word[0] == '?')
+        {
+            char *value = ft_itoa(MY_WEXITSTATUS(*exit_status));
+            return (value);
+        }
         if (ft_strncmp(word, env[i], ft_strlen(word)) == 0)
             return (ft_substr(env[i], ft_strlen(word) + 1, ft_strlen(env[i]) - ft_strlen(word) - 1));
         i++;
@@ -105,7 +110,7 @@ char *get_env_value(char *word, char **env)
 }
 
 // utiliser fonction thomas pour les quotes externe
-void replaceEnvVars(char **str, char **env)
+void replaceEnvVars(char **str, char **env, int *exit_status)
 {
     int i = 0;
     int j = 0;
@@ -116,14 +121,14 @@ void replaceEnvVars(char **str, char **env)
         {
             j = 1;
             char *word = ft_substr(tmp + i + 1, 0, j);
-            while (!in_env(ft_strjoin(word, "="), env) && tmp[i + j])
+            while (!in_env(ft_strjoin(word, "="), env) && tmp[i + j] || word[0] != '?')
             {
                 word = ft_substr(tmp + i + 1, 0, j);
                 j++;
             }
-            if (in_env(word, env))
+            if (in_env(word, env) || word[0] == '?')
             {
-                char *value = get_env_value(word, env);
+                char *value = get_env_value(word, env, exit_status);
                 if (value)
                 {
                     char *new_str = ft_strjoin(ft_substr(tmp, 0, i), value);

@@ -1,7 +1,5 @@
 #include "../header/minishell.h"
 
-#include <string.h>
-
 int ft_strcmp(char *value1, char *value2) {
     while (*value1 && (*value1 == *value2)) {
         value1++;
@@ -368,7 +366,8 @@ char **check_wildcard(char **split_nodeValue)
     return (tab_current_file);
 }
 
-void execute_command(ASTNode* node, char ***env, command *cmd, int fd) {
+void execute_command(ASTNode* node, char ***env, command *cmd, int fd, int *exit_status)
+{
     char **split_nodeValue;
     int p_id[2];
     pid_t pid;
@@ -384,7 +383,7 @@ void execute_command(ASTNode* node, char ***env, command *cmd, int fd) {
         fd = p_id[1];
     if (node->inputs)
         redirection_in(node->inputs->filename);
-    replaceEnvVars(&node->value, *env);
+    replaceEnvVars(&node->value, *env, exit_status);
     split_nodeValue = ft_split(node->value, ' ');
     split_nodeValue = check_wildcard(split_nodeValue);
     if (is_builtin(clean_quote(split_nodeValue[0])))
@@ -405,7 +404,7 @@ void execute_command(ASTNode* node, char ***env, command *cmd, int fd) {
         handle_parent_process(node, cmd, p_id, pid);
 }
 
-void execute_parenthese(ASTNode* node, char ***env, int fd, command *cmd) {
+void execute_parenthese(ASTNode* node, char ***env, int fd, command *cmd, int *exit_status) {
     int p_id[2];
     pid_t pid;
 
@@ -433,7 +432,7 @@ void execute_parenthese(ASTNode* node, char ***env, int fd, command *cmd) {
             dup2(cmd->std_out, STDOUT_FILENO);
             close(cmd->std_out);
         }
-        lexer(ft_substr(node->value, 1, ft_strlen(node->value) - 2), env);
+        lexer(ft_substr(node->value, 1, ft_strlen(node->value) - 2), env, exit_status);
         exit(EXIT_SUCCESS);
     } else {
         waitpid(pid, NULL, 0);
@@ -450,7 +449,7 @@ void execute_parenthese(ASTNode* node, char ***env, int fd, command *cmd) {
     }
 }
 
-void execute_output_append_command(ASTNode* node, char ***env, command *cmd) {
+void execute_output_append_command(ASTNode* node, char ***env, command *cmd, int *exit_status) {
     if (node->outputs){
         while (node->outputs) {
             int fd = open(node->outputs->filename, O_WRONLY | O_CREAT, 0644);
@@ -458,7 +457,7 @@ void execute_output_append_command(ASTNode* node, char ***env, command *cmd) {
                 perror("open");
                 exit(EXIT_FAILURE);
             }
-            execute_command(node, env, cmd, fd);
+            execute_command(node, env, cmd, fd, exit_status);
             close(fd);
             node->outputs = node->outputs->next;
         }
@@ -471,16 +470,16 @@ void execute_output_append_command(ASTNode* node, char ***env, command *cmd) {
                 perror("open");
                 exit(EXIT_FAILURE);
             }
-            execute_command(node, env, cmd, fd);
+            execute_command(node, env, cmd, fd, exit_status);
             close(fd);
             node->appends = node->appends->next;
         }
     }
     if (!node->is_last_command)
-        execute_command(node, env, cmd, -1);
+        execute_command(node, env, cmd, -1, exit_status);
 }
 
-void execute_output_append_parenthese(ASTNode* node, char ***env, command *cmd) {
+void execute_output_append_parenthese(ASTNode* node, char ***env, command *cmd, int *exit_status) {
     if (node->outputs) {
         while (node->outputs) {
             int fd = open(node->outputs->filename, O_WRONLY | O_CREAT, 0644);
@@ -488,7 +487,7 @@ void execute_output_append_parenthese(ASTNode* node, char ***env, command *cmd) 
                 perror("open");
                 exit(EXIT_FAILURE);
             }
-            execute_parenthese(node, env, fd, cmd);
+            execute_parenthese(node, env, fd, cmd, exit_status);
             close(fd);
             node->outputs = node->outputs->next;
         }
@@ -500,29 +499,29 @@ void execute_output_append_parenthese(ASTNode* node, char ***env, command *cmd) 
                 perror("open");
                 exit(EXIT_FAILURE);
             }
-            execute_parenthese(node, env, fd, cmd);
+            execute_parenthese(node, env, fd, cmd, exit_status);
             close(fd);
             node->appends = node->appends->next;
         }
     }
-    execute_parenthese(node, env, -1, cmd);
+    execute_parenthese(node, env, -1, cmd, exit_status);
 }
 
-void processBinaryTree2(ASTNode* node, char ***env, command *cmd) {
+void processBinaryTree2(ASTNode* node, char ***env, command *cmd, int *exit_status) {
     if (node == NULL) return;
-    processBinaryTree2(node->left, env, cmd);
+    processBinaryTree2(node->left, env, cmd, exit_status);
     if (node->type == NODE_COMMAND) {
         if (node->outputs || node->appends)
-            execute_output_append_command(node, env, cmd);
+            execute_output_append_command(node, env, cmd, exit_status);
         else
         {
-            execute_command(node, env, cmd, -1);
+            execute_command(node, env, cmd, -1, exit_status);
         }
     }
     if (node->type == NODE_PARENTHESE) {
-        execute_output_append_parenthese(node, env, cmd);
+        execute_output_append_parenthese(node, env, cmd, exit_status);
     }
-    processBinaryTree2(node->right, env, cmd);
+    processBinaryTree2(node->right, env, cmd, exit_status);
 }
 
 command *init_command(int test, int test2) {
@@ -534,20 +533,21 @@ command *init_command(int test, int test2) {
     return cmd;
 }
 
-void    free_command(command *cmd)
+void    free_command(command *cmd, int *exit_status)
 {
     for (int j = 0; j < cmd->pid_count; j++)
-        waitpid(cmd->pids[j], NULL, 0);
+        waitpid(cmd->pids[j], exit_status, 0);
     free(cmd->pids);
     free(cmd);
 }
 
-void expandCommandTrees2(StartNode* startNode, char ***env) {
+void expandCommandTrees2(StartNode* startNode, char ***env, int *exit_status) {
     if (!startNode->hasLogical) 
     {
         command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
-        processBinaryTree2(startNode->children[0]->left, env, cmd);
-        free_command(cmd);
+        processBinaryTree2(startNode->children[0]->left, env, cmd, exit_status);
+        free_command(cmd, exit_status);
+        //printf("exit_status: %d\n", MY_WEXITSTATUS(*exit_status));
     } 
     else 
     {
@@ -556,22 +556,22 @@ void expandCommandTrees2(StartNode* startNode, char ***env) {
             if (startNode->children[i]->left) 
             {
                 command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
-                processBinaryTree2(startNode->children[i]->left, env, cmd);
-                free_command(cmd);
+                processBinaryTree2(startNode->children[i]->left, env, cmd, exit_status);
+                free_command(cmd, exit_status);
             }
             if (i == 0 && startNode->children[i]->right) 
             {
                 command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
-                processBinaryTree2(startNode->children[i]->right, env, cmd);
-                free_command(cmd);
+                processBinaryTree2(startNode->children[i]->right, env, cmd, exit_status);
+                free_command(cmd, exit_status);
             }
         }
     }
 }
 
 // Fonction principale pour exécuter le nœud de départ
-void executer(StartNode* startNode, char ***env) {
+void executer(StartNode* startNode, char ***env, int *exit_status) {
     global_sig = 1;
-    expandCommandTrees2(startNode, env);
+    expandCommandTrees2(startNode, env, exit_status);
     global_sig = 0;
 }

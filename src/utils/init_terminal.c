@@ -50,7 +50,7 @@ void  init_terminal(char **env)
 }
 
 
-void start_terminal(int ac, char **av, char **env)
+void start_terminal(int ac, char **av, char **env, int exit_status)
 {
     char *input;
     
@@ -63,6 +63,6 @@ void start_terminal(int ac, char **av, char **env)
             exit(1);
         }
         add_history(input);
-        check_prompt(input, &env);
+        check_prompt(input, &env, &exit_status);
     }
 }

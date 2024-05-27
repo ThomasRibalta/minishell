@@ -81,19 +81,19 @@ char *clean_quote(char *input)
     return (input);
 }
 
-char *clean_prompt(char *input, char ***env)
+char *clean_prompt(char *input, char ***env, int *exit_status)
 {
     char *prompt;
 
     prompt = clean_white_space(input);
-    lexer(prompt, env);
+    lexer(prompt, env, exit_status);
     return (prompt);
 }
 
-void check_prompt(char *input, char ***env)
+void check_prompt(char *input, char ***env, int *exit_status)
 {
     char *prompt;
 
-    prompt = clean_prompt(input, env);
+    prompt = clean_prompt(input, env, exit_status);
     free(prompt);
 }
