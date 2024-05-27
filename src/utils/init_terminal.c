@@ -50,7 +50,7 @@ void  init_terminal(char **env)
 }
 
 
-void start_terminal(int ac, char **av, char **env, int exit_status)
+void start_terminal(char **env, int exit_status)
 {
     char *input;
     

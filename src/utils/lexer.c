@@ -158,9 +158,11 @@ int	ft_strlenc_file(char *str, char c)
 	i = 0;
     j = 0;
     while (str[i] == c)
+	{
         i++;
 	while (str[i] != '\0' && str[i] != c && !is_separator(str, i))
 		i++;
+	}
 	return (i + j);
 }
 
@@ -303,7 +305,7 @@ char **tab_clean(char **tab)
     int     j;
 
     j = 0;
-    new_tab = malloc(sizeof(char *) * len_tab(tab) + 1);
+    new_tab = malloc(sizeof(char *) * (len_tab(tab) + 1));
     while (tab[j])
     {
         new_tab[j] = clean_white_space(tab[j]);

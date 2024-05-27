@@ -9,6 +9,8 @@ void    init_mask(struct sigaction *sig)
 
 void signal_handler(int signum, siginfo_t *siginfo, void *context) 
 {
+	(void) siginfo;
+	(void) context;
     if (signum == SIGINT && global_sig == 0)
     {
         write(1,"\n", 2);

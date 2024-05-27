@@ -88,7 +88,7 @@ typedef struct StartNode {
     bool hasLogical; // Boolean to indicate if there are logical nodes
 } StartNode;
 
-int global_sig;
+extern int global_sig;
 
 void	init_terminal(char **env);
 void	edit_shlvl(char **env);
@@ -104,7 +104,7 @@ void echo(char **tab);
 void cd(char **tab, char ***env);
 void lexer(char *input, char ***env, int *exit_status);
 void init_signal();
-void start_terminal(int ac, char **av, char **env, int exit_status);
+void start_terminal(char **env, int exit_status);
 char *get_cwd(int i);
 char *clean_white_space(char *input);
 char *clean_quote(char *input);
@@ -117,7 +117,7 @@ void executer(StartNode* startNode, char ***env, int *exit_status);
 void printEntireAST(const StartNode* startNode);
 void freeRedirectionList(Redirection** list);
 void export_var2(char ***env, const char *name, const char *value);
-void expenser(StartNode* startNode, char ***env);
+void expenser(StartNode* startNode);
 void unset_var2(char ***env, const char *name);
 
 

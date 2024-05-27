@@ -121,7 +121,7 @@ void replaceEnvVars(char **str, char **env, int *exit_status)
         {
             j = 1;
             char *word = ft_substr(tmp + i + 1, 0, j);
-            while (!in_env(ft_strjoin(word, "="), env) && tmp[i + j] || word[0] != '?')
+            while ((!in_env(ft_strjoin(word, "="), env) && tmp[i + j]) || word[0] != '?')
             {
                 word = ft_substr(tmp + i + 1, 0, j);
                 j++;
@@ -145,7 +145,7 @@ void replaceEnvVars(char **str, char **env, int *exit_status)
     *str = tmp;
 }
 
-void expenser(StartNode* startNode, char ***env)
+void expenser(StartNode* startNode)
 {
 	//expandCommandTrees(startNode, replaceEnvVars, env);
 	is_last_command(startNode);

@@ -26,11 +26,11 @@ SRC_1 = src/utils/parser/expenser.c \
 OBJ_1 = ${SRC_1:.c=.o}
 
 .c.o:
-	${CC} -c $< -o ${<:.c=.o}
+	${CC} ${FLAGS} -c $< -o ${<:.c=.o}
 
 ${NAME}: ${OBJ_1}
 	make -C src/utils/libft
-	${CC} ${FLAGS} ${OBJ_1} main.c -o ${NAME} -L src/utils/libft -lft -l readline
+	${CC} ${FLAGS} ${OBJ_1} main.c -g -o ${NAME} -L src/utils/libft -lft -l readline
 
 all: ${NAME}
 

@@ -82,7 +82,7 @@ void execute(char **param, char *path, char **env) {
     exit(EXIT_FAILURE);
 }
 
-int execute_builtin(ASTNode *node, char ***env, char **param){
+int execute_builtin(char ***env, char **param){
     if (ft_strcmp(clean_quote(param[0]), "exit") == 0)
         exit_program(param[1]);
     else if (ft_strcmp(clean_quote(param[0]), "cd") == 0)
@@ -96,7 +96,7 @@ int execute_builtin(ASTNode *node, char ***env, char **param){
     return 0;
 }
 
-int execute_fork_builtin(ASTNode *node, char **env, char **param){
+int execute_fork_builtin(char **env, char **param){
     if (ft_strcmp(clean_quote(param[0]), "echo") == 0)
         echo(param + 1);
     else if (ft_strcmp(clean_quote(param[0]), "env") == 0)
@@ -108,7 +108,7 @@ int execute_fork_builtin(ASTNode *node, char **env, char **param){
     exit(0);
 }
 
-void handle_child_process(ASTNode* node, command *cmd, int p_id[2], char **split_nodeValue, char ***env, int fd) {
+void handle_child_process(ASTNode *node, command *cmd, int p_id[2], char **split_nodeValue, char ***env, int fd) {
     if (!(node->is_last_command) || node->outputs != NULL || node->appends != NULL)
     {
         dup2(fd, STDOUT_FILENO);
@@ -121,13 +121,13 @@ void handle_child_process(ASTNode* node, command *cmd, int p_id[2], char **split
     }
     if (is_fork_builtin(clean_quote(split_nodeValue[0])))
     {
-        execute_fork_builtin(node, *env, split_nodeValue);
+        execute_fork_builtin(*env, split_nodeValue);
         exit(EXIT_SUCCESS);
     }
     execute(split_nodeValue, get_path(*env), *env);
 }
 
-void handle_parent_process(ASTNode* node, command *cmd, int p_id[2], pid_t pid) {
+void handle_parent_process(ASTNode *node, command *cmd, int p_id[2], pid_t pid) {
     if (!(node->is_last_command))
     {
         dup2(p_id[0], STDIN_FILENO);
@@ -203,7 +203,7 @@ char **get_current_file()
     }
     while ((entry = readdir(dir)) != NULL)
     {
-        if (entry->d_name[0] == '.' && (entry->d_name[1] == '\0' || (entry->d_name[1] == '.' && entry->d_name[2] == '\0')) || entry->d_name[0] == '.') {
+        if ((entry->d_name[0] == '.' && (entry->d_name[1] == '\0' || (entry->d_name[1] == '.' && entry->d_name[2] == '\0'))) || entry->d_name[0] == '.') {
             continue;
         }
         tab[i] = strdup(entry->d_name);
@@ -326,7 +326,7 @@ char **replace_wildcard(char **tab, int i, int pos, int j)
                 n++;
             }
         }
-        m++;
+       m++;
     }
     new_tab[n] = NULL;
     return (new_tab);
@@ -336,8 +336,7 @@ char **check_wildcard(char **split_nodeValue)
 {
     int i = 0;
     int j = 0;
-    int pos = 0;
-    char **tab_current_file;
+    char **tab_current_file = split_nodeValue;
 
     while (split_nodeValue[i])
     {
@@ -388,7 +387,7 @@ void execute_command(ASTNode* node, char ***env, command *cmd, int fd, int *exit
     split_nodeValue = check_wildcard(split_nodeValue);
     if (is_builtin(clean_quote(split_nodeValue[0])))
     {
-        execute_builtin(node, env, split_nodeValue);
+        execute_builtin(env, split_nodeValue);
         return;
     }
     pid = fork();
