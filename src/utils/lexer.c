@@ -37,204 +37,89 @@ void freeTokens(Token* head) {
     }
 }
 
-// Fonction pour afficher les tokens (pour démonstration)
-void printTokens(const Token* head) {
-    while (head != NULL) {
-        printf("Token Type: %d, Value: %s\n", head->type, head->value ? head->value : "NULL");
-        head = head->next;
-    }
-}
+#define NUM_SYMBOLS 7
 
-int is_separator(char *s, int i) {
-    if ((s[i] == '|' && s[i + 1] == '|') || (s[i] == '&' && s[i + 1] == '&'))
-        return 1;
-    else if (s[i] == '<' || s[i] == '>' || s[i] == '|')
-        return 1;
-    else if (s[i] == '>' && s[i + 1] == '>')
-        return 1;
-    else if (s[i] == '<' && s[i + 1] == '<')
-        return 1;
-    else
-        return 0;
-}
+const char *symbols[NUM_SYMBOLS] = {"||", "&&", ">>", ">", "<<", "<", "|"};
 
-int len_separator(char *s, int i)
-{
-    if ((s[i] == '|' && s[i + 1] == '|') || (s[i] == '&' && s[i + 1] == '&'))
-        return 2;
-    else if (s[i] == '>' && s[i + 1] == '>')
-        return 2;
-    else if (s[i] == '<' && s[i + 1] == '<')
-        return 2;
-    else if (s[i] == '<' || s[i] == '>' || s[i] == '|')
-        return 1;
-    else
-        return 0;
-}
-
-int check_separator(char *s, int i)
-{
-    if (!(in_special_zone(s, i)))
-    {
-        if (is_separator(s, i))
-            return (1);
-    }
-    return (0);
-}
-
-int count_words(char *str)
-{
-    int i;
-    int j;
-
-    i = 0;
-    j = 0;
-    while (str[i])
-    {
-        if (!check_separator(str, i) && (check_separator(str, i + 1) || str[i + 1] == '\0'))
-            j++;
-        if (check_separator(str, i))
-        {
-            i += len_separator(str, i) - 1;
-            if (str[i] == '<' || str[i] == '>')
-                j++;
-            j++;
+int is_symbol(const char *str, int *symbol_length) {
+    for (int i = 0; i < NUM_SYMBOLS; i++) {
+        int len = strlen(symbols[i]);
+        if (strncmp(str, symbols[i], len) == 0) {
+            *symbol_length = len;
+            return 1;
         }
-        i++;
     }
-    return j;
+    return 0;
 }
 
-int	ft_strlenc(char *str)
-{
-	int	i;
-
-	i = 0;
-    if (is_separator(str, 0))
-    {
-        return (len_separator(str, 0));
-    }
-	while (str[i] != '\0' && !check_separator(str, i))
-		i++;
-	return (i);
-}
-static char	*get_word(char *str)
-{
-	char	*word;
-	int		i;
-
-	i = 0;
-	word = malloc(sizeof(char) * (ft_strlenc(str) + 1));
-	while (i < ft_strlenc(str))
-	{
-		word[i] = str[i];
-		i++;
-	}
-	word[i] = '\0';
-	return (word);
-}
-
-char *get_separator(char *s)
-{
-    char *sep;
+int count_tokens(const char *input) {
+    int count = 0;
+    const char *start = input;
+    const char *current = input;
     int i;
 
     i = 0;
-    sep = malloc(sizeof(char *) * (len_separator(s, 0) + 1));
-    while (i < len_separator(s, 0))
-    {
-        sep[i] = s[i];
-        i++;
-    }
-    sep[i] = '\0';
-    return (sep);
-}
-
-int	ft_strlenc_file(char *str, char c)
-{
-	int	i;
-    int j;
-
-	i = 0;
-    j = 0;
-    while (str[i] == c)
-	{
-        i++;
-	while (str[i] != '\0' && str[i] != c && !is_separator(str, i))
-		i++;
-	}
-	return (i + j);
-}
-
-char	*get_word_file(char *str, char c)
-{
-	char	*word;
-	int		i;
-
-	i = 0;
-	word = malloc(sizeof(char) * (ft_strlenc_file(str, c) + 1));
-	while (i < ft_strlenc_file(str, c))
-	{
-		word[i] = str[i];
-		i++;
-	}
-	word[i] = '\0';
-	return (word);
-}
-
-char	**split_prompt(char *s)
-{
-	char	**tab;
-	int		i;
-    int     j;
-
-	i = 0;
-    j = 0;
-	tab = malloc(sizeof(char *) * (count_words(s) + 1));
-	if (!tab)
-		return (NULL);
-	while (s[j] != '\0')
-	{
-		while (s[j] != '\0' && check_separator(s, j))
-        {
-                if (s[j] == '<' || s[j] == '>')
-                {
-                    tab[i++] = get_separator(s + j);
-        		    j += len_separator(s + j, 0);
-                    tab[i++] = get_word_file(s + j, ' ');
-                    j += ft_strlenc_file(s + j, ' ');
-                }
-                else
-                {
-                    tab[i++] = get_separator(s + j);
-                    j += len_separator(s + j, 0);
-                }
+    while (current[i]) {
+        int symbol_length = 0;
+        if (is_symbol(current + i, &symbol_length) && !in_special_zone((char *)current, i)){
+            if (current + i > start) {
+                count++;
+            }
+            count++;
+            i += symbol_length;
+            start = current + i;
+        } else {
+            i++;
         }
-        while (s[j] == ' ')
-            j++;
-		if (s[j] != '\0')
-		{
-			tab[i] = get_word(s + j);
-			i++;
-            j += ft_strlenc(s + j);
-		}
-	}
-	tab[i] = 0;
-	return (tab);
+    }
+    if (current + i > start)
+        count++;
+    return count;
 }
 
-char   **aff_table(char **tab)
-{
-    int j;
+char **split_with_symbols(const char *input) {
+    int token_count = count_tokens(input);
+    char **result = (char **)malloc(sizeof(char *) * (token_count + 1));
+    int count = 0;
+    const char *start = input;
+    const char *current = input;
+    int i;
 
-    j = 0;
-    printf("-=-=PROMPT APRES SPLIT=-=-\n\n");
-    while (tab[j])
-    {
-        printf("%s\n", tab[j]);
-        j++;
+    i = 0;
+    while (current[i]) {
+        int symbol_length = 0;
+        if (is_symbol(current + i, &symbol_length) && !in_special_zone((char *)current, i)){
+            if (current + i > start) {
+                int len = (current + i) - start;
+                char *token = (char *)malloc(len + 1);
+                strncpy(token, start, len);
+                token[len] = '\0';
+                result[count++] = token;
+            }
+
+            char *symbol = (char *)malloc(symbol_length + 1);
+            strncpy(symbol, current + i, symbol_length);
+            symbol[symbol_length] = '\0';
+            result[count++] = symbol;
+
+            i += symbol_length;
+            start = current + i;
+        } else {
+            i++;
+        }
     }
-    return (tab);
+
+    if (current + i > start) {
+        int len = (current + i) - start;
+        char *token = (char *)malloc(len + 1);
+        strncpy(token, start, len);
+        token[len] = '\0';
+        result[count++] = token;
+    }
+
+    result[count] = NULL;
+
+    return result;
 }
 
 char *here_doc(char *end)
@@ -242,19 +127,22 @@ char *here_doc(char *end)
     char *value;
     char	*tmp;
 	int		i;
+    char *tmp2;
 
 	i = 0;
     value = malloc(sizeof(char *));
     value[0] = '\0';
+    tmp2 = clean_quote(ft_strdup(end));
 	while (i != 1)
 	{
 		write(1, "Here_doc >> ", 13);
 		tmp = get_next_line(0);
-		if (ft_strncmp(tmp, end, ft_strlen(end)) == 0)
+		if (ft_strncmp(tmp, tmp2, ft_strlen(end)) == 0)
 			break ;
         value = ft_strjoin(value, tmp);
         free(tmp);
 	}
+    free(tmp2);
     return (value);
 }
 
@@ -293,9 +181,7 @@ int len_tab(char **tab)
 
     i = 0;
     while (tab[i])
-    {
         i++;
-    }
     return (i);
 }
 
@@ -316,45 +202,127 @@ char **tab_clean(char **tab)
     return (new_tab);
 }
 
-int check_error_tab(char **tab_input){
-    int j;
+bool contains_invalid_sequences(char **tab, int size) 
+{
+    const char *symbols[] = {"||", "&&", ">>", ">", "<<", "<", "|"};
+    int num_symbols = sizeof(symbols) / sizeof(symbols[0]);
+    int i = 0;
 
-    j = 0;
-    if (tab_input[j][0] == '|' || tab_input[j][0] == '&')
+    while (i < size)
     {
-        printf("Lexer error near : %s\n", tab_input[j]);
+        int j = 0;
+        while (j < num_symbols)
+        {
+            if (strcmp(tab[i], symbols[j]) == 0)
+            {
+                if (i == size - 1)
+                {
+                    ft_putstr_fd("syntax error near unexpected token `", 2);
+                    ft_putstr_fd(tab[i], 2);
+                    ft_putstr_fd("'\n", 2);
+                    return true;
+                }
+                int k = 0;
+                while (k < num_symbols)
+                {
+                    if (strcmp(tab[i + 1], symbols[k]) == 0)
+                    {
+                        ft_putstr_fd("syntax error near unexpected token `", 2);
+                        ft_putstr_fd(tab[i + 1], 2);
+                        ft_putstr_fd("'\n", 2);
+                        return true;
+                    }
+                    k++;
+                }
+            }
+            j++;
+        }
+        i++;
+    }
+    return false;
+}
+
+int check_input_error(char *input)
+{
+    int i;
+
+    i = 0;
+    if ((input[0] == ':' || input[0] == '#') && input[1] == '\0')
         return (0);
-    }
-    while (tab_input[j]){
-        if ((tab_input[j][0] == '|' || tab_input[j][0] == '&') && 
-            (tab_input[j + 1][0] == '|' || tab_input[j + 1][0] == '&'))
-            {
-                printf("Lexer error near : %s + %s\n", tab_input[j], tab_input[j + 1]);
-                return (0);
-            }
-        if ((tab_input[j][0] == '>' || tab_input[j][0] == '<') && 
-            (tab_input[j + 1][0] == '>' || tab_input[j + 1][0] == '<'))
-            {
-                printf("Lexer error near : %s + %s\n", tab_input[j], tab_input[j + 1]);
-                return (0);
-            }
-        j++;
-    }
+    else if (input[0] == '!' && input[1] == '\0')
+        return (0);
+    else if (input[0] == '\0')
+        return (0);
+    while (input[i] == ' ' || input[i] == '\t')
+            i++;
+    if (input[i] == '\n')
+        return (0);
     return (1);
 }
 
-void lexer(char *input, char ***env, int *exit_status)
+char *fuse_split_result(char **split_input, int start)
+{
+    char *result;
+    int i;
+
+    i = start;
+    result = ft_strdup(split_input[start]);
+    while (split_input[i])
+    {
+        result = ft_strjoin(result, ft_strdup(" "));
+        if (split_input[i + 1])
+            result = ft_strjoin(result, ft_strdup(split_input[i + 1]));
+        i++;
+    }
+    return (result);
+}
+
+char **re_build_with_redir(char **tab_input)
+{
+    char **split_input;
+    int i;
+
+    i = 0;
+    while (tab_input[i])
+    {
+        if (((tab_input[i][0] == '<' && (tab_input[i][1] == '\0' || tab_input[i][1] == '<')) 
+        || (tab_input[i][0] == '>' && (tab_input[i][1] == '\0' || tab_input[i][1] == '>'))) && tab_input[i + 1])
+        {
+            split_input = ft_split(tab_input[i + 1], ' ');
+            if (len_tab(split_input) > 1)
+            {
+                char **tmptab = malloc(sizeof(char *) * 3);
+                tmptab[0] = ft_strdup(tab_input[i]);
+                tmptab[1] = ft_strdup(split_input[0]);
+                tmptab[2] = NULL;
+                tab_input[i + 1] = fuse_split_result(split_input, 1);
+                tab_input = fusionner_tableaux(tab_input, tmptab, len_tab(tab_input), len_tab(tmptab), i);
+            }
+            free_tab(split_input);
+        }
+        i++;
+    }
+    return (tab_input);
+}
+
+void lexer(char *input, char ***env, char ***export, int *exit_status)
 {
     char **tab_input;
     Token *list = NULL;
 
-    if (ft_strlen(input) == 0)
+    if (!input || !check_input_error(input))
         return ;
-    tab_input = split_prompt(input);
+    tab_input = split_with_symbols(input);
+    tab_input = re_build_with_redir(tab_input);
     tab_input = tab_clean(tab_input);
-    if(!check_error_tab(tab_input))
+    if(contains_invalid_sequences(tab_input, len_tab(tab_input)))
+    {
+        *exit_status = 2;
+        free_tab(tab_input);
         return ;
+    }
     chained_split_prompt(&list, tab_input);
-    parser(list, env, exit_status);
+    free_tab(tab_input);
+    parser(list, env, export, exit_status);
     freeTokens(list);
 }

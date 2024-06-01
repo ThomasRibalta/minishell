@@ -49,9 +49,7 @@ int in_special_zone(char *input, int i)
         else if (input[j] == '(') 
         {
             if (!open_double_quote && !open_single_quote) 
-            {
                     open_parenthesis++;
-            }
         }
         else if (input[j] == ')') 
         {
@@ -87,6 +85,8 @@ static int	ft_allocate(char **tab, char const *s, char sep, size_t *h_error)
 		j = 0;
 		while (s[j] == sep)
 			j++;
+		if (s[j] == '\0')
+			break ;
 		tmp = s + j;
 		i = 0;
 		while (tmp[i] && (tmp[i] != sep || in_special_zone((char *)tmp, i)))
@@ -154,7 +154,7 @@ char	**ft_split(char const *s, char c)
 // #include <stdio.h>
 // int	main(void)
 // {
-// 	char **test = ft_split("salut", ' ');
+// 	char **test = ft_split("salut ", ' ');
 // 	for (int i = 0; i < 4; i++)
 // 		printf("word %d : %s\n", i, test[i]);
 // 	return (0);

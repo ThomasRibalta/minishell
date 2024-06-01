@@ -99,13 +99,14 @@ void addLogicalNodeToStartNode(StartNode* startNode, Token* tokens) {
     }
 }
 
-Redirection* createRedirection(char* filename) {
+Redirection* createRedirection(char* filename, int caracteristic) {
     Redirection* redir = (Redirection*)malloc(sizeof(Redirection));
     if (!redir) {
         perror("Failed to allocate memory for Redirection");
         exit(EXIT_FAILURE);
     }
     redir->filename = filename;
+    redir->caracteristic = caracteristic;
     redir->next = NULL;
     return redir;
 }
@@ -183,15 +184,11 @@ ASTNode* buildCommandPipeTree(Token** currentToken) {
         	case TOKEN_REDIRECTION_APPEND:
         	case TOKEN_HEREDOC:
             {
-                Redirection* newRedir = createRedirection((*currentToken)->value);
-                if ((*currentToken)->type == TOKEN_REDIRECTION_IN)
+                Redirection* newRedir = createRedirection((*currentToken)->value, ((*currentToken)->type == TOKEN_REDIRECTION_APPEND || (*currentToken)->type == TOKEN_HEREDOC));
+                if ((*currentToken)->type == TOKEN_REDIRECTION_IN || (*currentToken)->type == TOKEN_HEREDOC)
                     addRedirection(&tempInputs, newRedir);
-                else if ((*currentToken)->type == TOKEN_REDIRECTION_OUT)
+                else if ((*currentToken)->type == TOKEN_REDIRECTION_OUT || (*currentToken)->type == TOKEN_REDIRECTION_APPEND)
                     addRedirection(&tempOutputs, newRedir);
-                else if ((*currentToken)->type == TOKEN_REDIRECTION_APPEND)
-                    addRedirection(&tempAppends, newRedir);
-                else if ((*currentToken)->type == TOKEN_HEREDOC)
-                    addRedirection(&tempHereDoc, newRedir);
             }
             break;
         }
@@ -253,18 +250,14 @@ void generateAndAttachBTree(StartNode* startNode, Token* tokens) {
     }
 }
 
-void parser(Token *tokens, char ***env, int *exit_status) {
-    //Token *tokens = lexer();
-    StartNode *startNode = createAndSetupStartNode(tokens);
+void parser(Token *tokens, char ***env, char ***export, int *exit_status)
+{
+    StartNode *startNode;
+    
+    startNode = createAndSetupStartNode(tokens);
     addLogicalNodeToStartNode(startNode, tokens);
     generateAndAttachBTree(startNode, tokens);
-
-    //printEntireAST(startNode);
-
     expenser(startNode);
-    executer(startNode, env, exit_status);
+    executer(startNode, env, export, exit_status);
 
-	//printf("%s\n", startNode->children[0]->left->left->value);
-
-    //free_lexer(&tokens);
 }

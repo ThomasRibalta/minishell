@@ -12,6 +12,11 @@ char *clean_white_space(char *input)
         i++;
     while ((!ft_isascii(input[j - 1]) || input[j - 1] == ' ') && j != 0)
         j--;
+    if (i >= j)
+    {
+        free(input);
+        return (NULL);
+    }
     clean_input = malloc((j - i + 1) * sizeof(char));
     if (!clean_input)
         return (NULL);
@@ -25,34 +30,6 @@ char *clean_white_space(char *input)
     return (clean_input);
 }
 
-// char *clean_command(char *input)
-// {
-//     int i;
-//     int count;
-//     char *command;
-
-//     i = 0;
-//     count = 0;
-//     while (input[i] != ' ' && input[i] != '\0')
-//     {
-//         if (input[i] == '"' || input[i] == 39)
-//             count++;
-//         i++;
-//     }
-//     command = malloc((i - count + 1) * sizeof(char));
-//     if (!command)
-//         return (NULL);
-//     i = 0;
-//     while (*input != ' ' && *input != '\0')
-//     {
-//         if (*input != '"' && *input != 39)
-//             command[i++] = ft_tolower(*input);
-//         input++;
-//     }
-//     command[i] = '\0';
-//     return (command);
-// }
-
 char *clean_quote(char *input)
 {
     int i;
@@ -62,14 +39,14 @@ char *clean_quote(char *input)
     tmp = 0;
     while (input[i])
     {
-        if (input[i] == '"' && ft_strnchr(input + i + 1, '"'))
+        if (input[i] == '"' && ft_strnchr(input + i + 1, '"') != -1)
         {
             tmp = i + 1 + ft_strnchr(input + i + 1, '"');
             input = ft_strjoin(ft_strjoin(ft_substr(input, 0, i), ft_substr(input, i + 1, ft_strnchr(input + i + 1, '"'))),
             ft_substr(input + 1, ft_strnchr(input + i + 1, '"') + i + 1, ft_strlen(input)));
             i = tmp - 2;
         }
-        else if (input[i] == 39 && ft_strnchr(input + i + 1, 39))
+        else if (input[i] == 39 && ft_strnchr(input + i + 1, 39) != -1)
         {
             tmp = i + 1 + ft_strnchr(input + i + 1, 39);
             input = ft_strjoin(ft_strjoin(ft_substr(input, 0, i), ft_substr(input, i + 1, ft_strnchr(input + i + 1, 39))),
@@ -81,19 +58,33 @@ char *clean_quote(char *input)
     return (input);
 }
 
-char *clean_prompt(char *input, char ***env, int *exit_status)
+char *clean_prompt(char *input, char ***env, char ***export, int *exit_status)
 {
     char *prompt;
 
     prompt = clean_white_space(input);
-    lexer(prompt, env, exit_status);
+    lexer(prompt, env, export, exit_status);
     return (prompt);
 }
 
-void check_prompt(char *input, char ***env, int *exit_status)
+void check_prompt(char *input, char ***env, char ***export, int *exit_status)
 {
     char *prompt;
 
-    prompt = clean_prompt(input, env, exit_status);
-    free(prompt);
+    prompt = clean_prompt(input, env, export, exit_status);
+    if (prompt)
+        free(prompt);
+}
+
+char **clean_quote_all(char **split_nodeValue)
+{
+    int i;
+
+    i = 0;
+    while (split_nodeValue[i])
+    {
+        split_nodeValue[i] = clean_quote(split_nodeValue[i]);
+        i++;
+    }
+    return split_nodeValue;
 }

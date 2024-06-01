@@ -50,19 +50,21 @@ void  init_terminal(char **env)
 }
 
 
-void start_terminal(char **env, int exit_status)
+void start_terminal(char **env,char **export, int exit_status)
 {
     char *input;
     
     while (1) 
     {
-        input = readline(ft_strjoin(ft_strjoin(VERT"→ "BLEU, get_cwd(1)), VIOLET" > "RESET));
+        char *make_readline = ft_strjoin(ft_strjoin(ft_strdup(VERT"→ "BLEU), get_cwd(1)), ft_strdup(VIOLET" > "RESET));
+        input = readline(make_readline);
         if (!input) 
         {
-            printf(VIOLET"\n\n FERMETURE DU TERMINAL, A LA PROCHAINE !! \n\n");
-            exit(1);
+            printf(VIOLET"\n\n FERMETURE DU TERMINAL, A LA PROCHAINE !! \n\n"RESET);
+            exit(0);
         }
         add_history(input);
-        check_prompt(input, &env, &exit_status);
+        check_prompt(input, &env, &export, &exit_status);
+        free(make_readline);
     }
 }

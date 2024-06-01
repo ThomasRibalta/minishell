@@ -59,6 +59,7 @@ typedef enum {
 
 typedef struct Redirection {
     char* filename;
+    int caracteristic;
     struct Redirection* next;
 } Redirection;
 
@@ -90,35 +91,44 @@ typedef struct StartNode {
 
 extern int global_sig;
 
+
+int len_tab(char **tab);
+char **check_wildcard(char **split_nodeValue);
 void	init_terminal(char **env);
 void	edit_shlvl(char **env);
 void	write_terminal_title(void);
+void free_tab(char **tab);
 void	clear_terminal(char **env);
-void  parser(Token *tokens, char ***env, int *exit_status);
-void print_env(char **env);
-void exit_program(char *value);
-void export_var(char ***env, char **tab);
+void  parser(Token *tokens, char ***env, char ***export, int *exit_status);
+char *get_env_value(char *word, char **env , int *exit_status);
+char **fusionner_tableaux(char **tab1, char **tab2, int sizetab1, int sizetab2, int i);
+int error_name(const char *name);
+char *pwd(int i);
+void print_env(char **env, int nb);
+void exit_program(char **value);
+int export_var(char ***env, char***export, char **tab);
 char **clone_env(char **env);
-void unset_var(char ***env, char **tab);
+int unset_var(char ***env, char **tab);
 void echo(char **tab);
-void cd(char **tab, char ***env);
-void lexer(char *input, char ***env, int *exit_status);
+int cd(char **tab, char ***env);
+void lexer(char *input, char ***env, char ***export, int *exit_status);
 void init_signal();
-void start_terminal(char **env, int exit_status);
+void start_terminal(char **env, char **export, int exit_status);
 char *get_cwd(int i);
 char *clean_white_space(char *input);
 char *clean_quote(char *input);
-char *clean_prompt(char *input, char ***env, int *exit_status);
-void check_prompt(char *input, char ***env, int *exit_status);
+char *clean_prompt(char *input, char ***env, char ***export, int *exit_status);
+void check_prompt(char *input, char ***env, char ***export, int *exit_status);
 char *clean_white_space(char *input);
 void replaceEnvVars(char **str, char **env, int *exit_status);
 void	free_lexer(Token **lexer);
-void executer(StartNode* startNode, char ***env, int *exit_status);
+void executer(StartNode* startNode, char ***env, char ***export, int *exit_status);
 void printEntireAST(const StartNode* startNode);
 void freeRedirectionList(Redirection** list);
-void export_var2(char ***env, const char *name, const char *value);
+int export_var2(char ***env, const char *name, const char *value);
 void expenser(StartNode* startNode);
-void unset_var2(char ***env, const char *name);
+char **clean_quote_all(char **split_nodeValue);
+int unset_var2(char ***env, const char *name);
 
 
 #endif

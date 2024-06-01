@@ -26,7 +26,7 @@ int	ft_strnchr(const char *str, int c)
 			return (i);
 		i++;
 	}
-	return (0);
+	return (-1);
 }
 
 char	*ft_strchr(const char *str, int c)

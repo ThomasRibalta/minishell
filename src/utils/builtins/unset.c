@@ -1,11 +1,13 @@
 #include "../../header/minishell.h"
 
-void unset_var2(char ***env, const char *name)
+int unset_var2(char ***env, const char *name)
 {
     char **current;
     char **next;
     
     current = *env;
+    if (error_name(name) == 1)
+        return (1);
     while (*current)
     {
         if (strncmp(*current, name, strlen(name)) == 0 && (*current)[strlen(name)] == '=')
@@ -18,20 +20,24 @@ void unset_var2(char ***env, const char *name)
                 next++;
             }
             *(next - 1) = NULL;
-            return;
+            return (1);
         }
         current++;
     }
+    return (0);
 }
 
-void unset_var(char ***env, char **tab) 
+int unset_var(char ***env, char **tab) 
 {
     int i;
+    int status;
 
     i = 0;
+    status = 0;
     while(tab[i])
     {
         unset_var2(env, tab[i]);
         i++;
-    }   
+    }
+    return (status);
 }

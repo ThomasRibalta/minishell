@@ -13,9 +13,10 @@ void signal_handler(int signum, siginfo_t *siginfo, void *context)
 	(void) context;
     if (signum == SIGINT && global_sig == 0)
     {
+        char *make_readline = ft_strjoin(ft_strjoin(ft_strdup(VERT"→ "BLEU), get_cwd(1)), ft_strdup(VIOLET" > "RESET));
         write(1,"\n", 2);
-        write(1, ft_strjoin(ft_strjoin(VERT"→ "BLEU, get_cwd(1)), VIOLET" > "RESET), 
-        ft_strlen(ft_strjoin(ft_strjoin(VERT"→ "BLEU, get_cwd(1)), VIOLET" > "RESET)));
+        write(1, make_readline, ft_strlen(make_readline));
+        free(make_readline);
     }
     else
         return ;

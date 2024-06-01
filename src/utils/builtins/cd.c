@@ -10,19 +10,39 @@ int ft_strlen_tab(char **tab)
     return (i);
 }
 
-void cd(char **tab, char ***env){
+int cd(char **tab, char ***env)
+{
     char *pwd = get_cwd(0);
     char *path;
 
-    if(ft_strlen_tab(tab) > 1){
-        printf("cd: too many arguments\n");
-        return;
+    if (pwd[0] == '\0')
+    {
+        ft_putstr_fd("cd: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory\n", 2);
+        return (1);
     }
-    path = ft_strjoin(pwd, "/");
-    path = ft_strjoin(path, tab[0]);
+    if(ft_strlen_tab(tab) > 1){
+        ft_putstr_fd("cd: too many arguments\n", 2);
+        return (1);
+    }
+    if (ft_strlen_tab(tab) == 1)
+    {
+        if (tab[0][0] != '/')
+        {
+            path = ft_strjoin(pwd, "/");
+            path = ft_strjoin(path, tab[0]);
+        }
+        else
+            path = tab[0];
+    }
+    else
+        path = get_env_value("HOME", *env, 0);
     if (chdir(path) == -1) {
-        printf("cd: %s: No such file or directory\n", path);
+        ft_putstr_fd("cd: ", 2);
+        ft_putstr_fd(path, 2);
+        ft_putstr_fd(": No such file or directory\n", 2);
+        return (1);
     }
     export_var2(env, "OLDPWD", pwd);
     export_var2(env, "PWD", path);
+    return (0);
 }
