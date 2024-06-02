@@ -34,10 +34,16 @@ typedef enum {
 } TokenType;
 
 typedef struct Command {
+    char ***env;
+    char ***export;
     int *pids;
     int pid_count;
     int std_in;
     int std_out;
+    int fd;
+    int here_doc;
+    int p_id[2];
+    int p_id2[2];
 } command;
 
 typedef struct Token {
@@ -128,6 +134,8 @@ void freeRedirectionList(Redirection** list);
 int export_var2(char ***env, const char *name, const char *value);
 void expenser(StartNode* startNode);
 char **clean_quote_all(char **split_nodeValue);
+char *remove_parenthese(char *str);
+int ft_strcmp(char *value1, char *value2);
 int unset_var2(char ***env, const char *name);
 
 

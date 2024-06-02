@@ -6,16 +6,16 @@ void echo(char **tab)
     
     i = 1;
     if (tab[1] == NULL || tab[1][0] == '\0')
-        printf("\n");
+        ft_putchar_fd('\n', 1);
     while (strcmp(tab[i], "-n") == 0)
         i++;
     while (tab[i] != NULL)
     {
-        printf("%s", tab[i]);
+        ft_putstr_fd(tab[i], 1);
         if (i + 1 < len_tab(tab))
-            printf(" ");
+            ft_putchar_fd(' ', 1);
         i++;
     }
     if (ft_strncmp(tab[1], "-n", 2) != 0)
-        printf("\n");
+        ft_putchar_fd('\n', 1);
 }

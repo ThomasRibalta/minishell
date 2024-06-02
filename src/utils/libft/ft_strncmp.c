@@ -31,6 +31,16 @@ int	ft_strncmp(const char *str1, const char *str2, size_t n)
 		return (0);
 }
 
+int ft_strcmp(char *value1, char *value2)
+{
+    while (*value1 && (*value1 == *value2))
+    {
+        value1++;
+        value2++;
+    }
+    return (*(unsigned char *)value1 - *(unsigned char *)value2);
+}
+
 /*#include <stdio.h>
 int	main(void)
 {

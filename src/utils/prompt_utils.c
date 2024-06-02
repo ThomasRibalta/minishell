@@ -76,6 +76,20 @@ void check_prompt(char *input, char ***env, char ***export, int *exit_status)
         free(prompt);
 }
 
+char *remove_parenthese(char *str)
+{
+    char *new_str;
+
+    if (str[ft_strlen(str) - 1] == ')')
+    {
+        new_str = ft_substr(str, 1, ft_strlen(str) - 2);   
+    }else
+    {
+        new_str = ft_substr(str, 1, ft_strlen(str) - 1);
+    }
+    return new_str;
+}
+
 char **clean_quote_all(char **split_nodeValue)
 {
     int i;

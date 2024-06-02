@@ -18,6 +18,10 @@ void signal_handler(int signum, siginfo_t *siginfo, void *context)
         write(1, make_readline, ft_strlen(make_readline));
         free(make_readline);
     }
+    else if (signum == SIGINT && global_sig == 1)
+    {
+        write(1, "\n", 2);
+    }
     else
         return ;
 }

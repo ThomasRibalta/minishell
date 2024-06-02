@@ -1,15 +1,5 @@
 #include "../header/minishell.h"
 
-int ft_strcmp(char *value1, char *value2)
-{
-    while (*value1 && (*value1 == *value2))
-    {
-        value1++;
-        value2++;
-    }
-    return (*(unsigned char *)value1 - *(unsigned char *)value2);
-}
-
 int is_builtin(char *value)
 {
     if (!ft_strcmp(value, "cd") ||
@@ -112,16 +102,16 @@ void execute(char **param, char *path, char **env)
     exit(EXIT_FAILURE);
 }
 
-int execute_builtin(char ***env, char ***export, char **param, ASTNode *node, int *exit_status)
+int execute_builtin(command *cmd, char **param, ASTNode *node, int *exit_status)
 {
     if (ft_strcmp(clean_quote(param[0]), "exit") == 0 && node->is_last_command)
         exit_program(param + 1);
     else if ((ft_strcmp(clean_quote(param[0]), "cd") == 0 || ft_strcmp(clean_quote(param[0]), "cd") == 0) && node->is_last_command)
-        *exit_status = cd(param + 1, env);
+        *exit_status = cd(param + 1, cmd->env);
     else if (ft_strcmp(clean_quote(param[0]), "export") == 0 && param[1] != NULL)
-        *exit_status = export_var(env, export, param + 1);
+        *exit_status = export_var(cmd->env, cmd->export, param + 1);
     else if (ft_strcmp(clean_quote(param[0]), "unset") == 0)
-        *exit_status = unset_var(env, param + 1);
+        *exit_status = unset_var(cmd->env, param + 1);
     else 
         return 1;
     return 0;
@@ -146,19 +136,19 @@ int execute_fork_builtin(char **env, char **export, char **param)
     exit(0);
 }
 
-void handle_child_process(ASTNode *node, command *cmd, int p_id[2], int fd, int here_doc, int p_id2[2])
+void handle_child_process(ASTNode *node, command *cmd)
 {
-    if (here_doc)
+    if (cmd->here_doc)
     {
-        close(p_id2[1]);
-        close(p_id[0]);
-        dup2(p_id2[0], STDIN_FILENO);
-        close(p_id2[0]);
+        close(cmd->p_id2[1]);
+        close(cmd->p_id[0]);
+        dup2(cmd->p_id2[0], STDIN_FILENO);
+        close(cmd->p_id2[0]);
     }
     if (!(node->is_last_command) || node->outputs != NULL || node->appends != NULL)
     {
-        dup2(fd, STDOUT_FILENO);
-        close(fd);
+        dup2(cmd->fd, STDOUT_FILENO);
+        close(cmd->fd);
     }
     else
     {
@@ -167,22 +157,22 @@ void handle_child_process(ASTNode *node, command *cmd, int p_id[2], int fd, int 
     }
 }
 
-void handle_parent_process(ASTNode *node, command *cmd, int p_id[2], int here_doc, int p_id2[2])
+void handle_parent_process(ASTNode *node, command *cmd)
 {
-    if (here_doc)
+    if (cmd->here_doc)
     {
-        close(p_id2[0]);
-        close(p_id2[1]);
-        close(p_id[1]);
+        close(cmd->p_id2[0]);
+        close(cmd->p_id2[1]);
+        close(cmd->p_id[1]);
         if (!(node->is_last_command))
-            dup2(p_id[0], STDIN_FILENO);
-        close(p_id[0]);
+            dup2(cmd->p_id[0], STDIN_FILENO);
+        close(cmd->p_id[0]);
     }
     else if (!(node->is_last_command))
     {
-        dup2(p_id[0], STDIN_FILENO);
-        close(p_id[0]);
-        close(p_id[1]);
+        dup2(cmd->p_id[0], STDIN_FILENO);
+        close(cmd->p_id[0]);
+        close(cmd->p_id[1]);
     } 
     else 
     {
@@ -191,11 +181,22 @@ void handle_parent_process(ASTNode *node, command *cmd, int p_id[2], int here_do
     }
 }
 
-int redirection_in(ASTNode *node, int p_id[2])
+void make_pipe(command *cmd, ASTNode *node)
+{
+    if (pipe(cmd->p_id2) == -1)
+    {
+        perror("pipe");
+        exit(EXIT_FAILURE);
+    }
+    while (node->inputs->next)
+        node->inputs = node->inputs->next;
+    write(cmd->p_id2[1], node->inputs->filename, ft_strlen(node->inputs->filename));
+}
+
+int redirection_in(ASTNode *node, int *exit_status, command *cmd)
 {
     char *filename;
 
-    (void)p_id;
     while (node->inputs->next)
         node->inputs = node->inputs->next;
     filename = node->inputs->filename;
@@ -205,126 +206,110 @@ int redirection_in(ASTNode *node, int p_id[2])
         if (fd == -1)
         {
             perror("open");
+            *exit_status = 1;
             return 2;
         }
         dup2(fd, STDIN_FILENO);
         close(fd);
     }
     else
+    {
+        make_pipe(cmd, node);
         return 1;
+    }
     return 0;
 }
 
-void execute_command(ASTNode* node, char ***env, char ***export, command *cmd, int fd, int *exit_status)
+char **execute_commande_split(ASTNode* node, int *exit_status, int *here_doc, command *cmd)
 {
     char **split_nodeValue;
-    int p_id[2], p_id2[2];
-    pid_t pid;
-    int here_doc = 0;
 
-    if (node == NULL || node->value == NULL)
-        return;
-    if (pipe(p_id) == -1)
-    {
-        perror("pipe");
-        exit(EXIT_FAILURE);
-    }
-    if (fd == -1)
-        fd = p_id[1];
     if (node->inputs)
-        here_doc = redirection_in(node, p_id);
-    if (here_doc == 1)
-    {
-        if (pipe(p_id2) == -1)
-        {
-            perror("pipe");
-            exit(EXIT_FAILURE);
-        }
-        while (node->inputs->next)
-            node->inputs = node->inputs->next;
-        write(p_id2[1], node->inputs->filename, ft_strlen(node->inputs->filename));
-    }
-    if (here_doc == 2)
-    {
-        *exit_status = 1;
-        return ;
-    }
-    replaceEnvVars(&node->value, *env, exit_status);
+        *here_doc = redirection_in(node, exit_status, cmd);
+    else
+        *here_doc = 0;
+    if (*here_doc == 2)
+        return NULL;
+    replaceEnvVars(&node->value, *(cmd->env), exit_status);
     split_nodeValue = ft_split(node->value, ' ');
     split_nodeValue = check_wildcard(split_nodeValue);
     split_nodeValue = clean_quote_all(split_nodeValue);
     if (split_nodeValue[0] == NULL)
-        return ((void) ft_putendl_fd("minishell: : command not found", 2));
+    {
+        ft_putendl_fd("minishell: : command not found", 2);
+        return NULL;
+    }
     if (is_builtin(clean_quote(split_nodeValue[0])))
     {
-        execute_builtin(env, export, split_nodeValue, node, exit_status);
-        if (*exit_status)
-            return ;
+        if (!execute_builtin(cmd, split_nodeValue, node, exit_status))
+            return NULL;
     }
-    pid = fork();
-    if (pid == -1) {
-        perror("fork");
-        exit(EXIT_FAILURE);
-    }
+    return (split_nodeValue);
+}
+
+void execute_command2(ASTNode* node, command *cmd, char **split_nodeValue, pid_t pid)
+{
     if (pid == 0)
     {
-        handle_child_process(node, cmd, p_id, fd, here_doc, p_id2);
+        handle_child_process(node, cmd);
         if (is_fork_builtin(clean_quote(split_nodeValue[0])))
-            execute_fork_builtin(*env, *export, split_nodeValue);
-        execute(split_nodeValue, get_path(*env), *env);
+            execute_fork_builtin(*(cmd->env), *(cmd->export), split_nodeValue);
+        execute(split_nodeValue, get_path(*(cmd->env)), *(cmd->env));
     }
     else
     {
-        handle_parent_process(node, cmd, p_id, here_doc, p_id2);
+        handle_parent_process(node, cmd);
         cmd->pids[cmd->pid_count] = pid;
         (cmd->pid_count)++;
+        free_all(split_nodeValue);
     }
 }
 
-char *remove_parenthese(char *str)
+void execute_command(ASTNode* node, command *cmd, int *exit_status)
 {
-    char *new_str;
-
-    if (str[ft_strlen(str) - 1] == ')')
-    {
-        new_str = ft_substr(str, 1, ft_strlen(str) - 2);   
-    }else
-    {
-        new_str = ft_substr(str, 1, ft_strlen(str) - 1);
-    }
-    return new_str;
-}
-
-void execute_parenthese(ASTNode* node, char ***env, char ***export, int fd, command *cmd, int *exit_status)
-{
-    int p_id[2], p_id2[2];
+    char **split_nodeValue;
     pid_t pid;
-    int here_doc = 0;
 
-    if (pipe(p_id) == -1) {
+    if (node == NULL || node->value == NULL)
+        return;
+    if (pipe(cmd->p_id) == -1)
+        return ((void) perror("pipe"), (void) exit(EXIT_FAILURE));
+    if (cmd->fd == -1)
+        cmd->fd = cmd->p_id[1];
+    split_nodeValue = execute_commande_split(node, exit_status, &(cmd->here_doc), cmd);
+    if (split_nodeValue == NULL)
+        return ;
+    pid = fork();
+    if (pid == -1)
+        return ((void) perror("fork"), (void) exit(EXIT_FAILURE));
+    execute_command2(node, cmd, split_nodeValue, pid);
+}
+
+int execute_parenthese2(command *cmd, ASTNode *node, int *exit_status)
+{
+    int here_doc;
+
+    here_doc = 0;
+    if (pipe(cmd->p_id) == -1) {
         perror("pipe");
         exit(EXIT_FAILURE);
     }
-    if (fd == -1)
-        fd = p_id[1];
+    if (cmd->fd == -1)
+        cmd->fd = cmd->p_id[1];
     if (node->inputs)
-        here_doc = redirection_in(node, p_id);
-    if (here_doc == 1)
-    {
-        if (pipe(p_id2) == -1)
-        {
-            perror("pipe");
-            exit(EXIT_FAILURE);
-        }
-        while (node->inputs->next)
-            node->inputs = node->inputs->next;
-        write(p_id2[1], node->inputs->filename, ft_strlen(node->inputs->filename));
-    }
+        here_doc = redirection_in(node, exit_status, cmd);
     if (here_doc == 2)
-    {
-        *exit_status = 1;
+        return (0);
+    return (here_doc);  
+}
+
+void execute_parenthese(ASTNode* node, command *cmd, int *exit_status)
+{
+    pid_t pid;
+    
+    cmd->here_doc = execute_parenthese2(cmd, node, exit_status);
+    if (cmd->here_doc == 0)
         return ;
-    }
     pid = fork();
     if (pid == -1) {
         perror("fork");
@@ -332,13 +317,13 @@ void execute_parenthese(ASTNode* node, char ***env, char ***export, int fd, comm
     }
     if (pid == 0)
     {
-        handle_child_process(node, cmd, p_id, fd, here_doc, p_id2);
-        lexer(remove_parenthese(node->value), env, export, exit_status);
+        handle_child_process(node, cmd);
+        lexer(remove_parenthese(node->value), cmd->env, cmd->export, exit_status);
         exit(EXIT_SUCCESS);
     }
     else 
     {
-        handle_parent_process(node, cmd, p_id, here_doc, p_id2);
+        handle_parent_process(node, cmd);
         waitpid(pid, NULL, 0);
     }
 }
@@ -348,9 +333,7 @@ int open_output_append(ASTNode *node)
     int fd;
 
     while (node->outputs->next)
-    {
         node->outputs = node->outputs->next;
-    }
     if (node->outputs->caracteristic == 1)
     {
         fd = open(node->outputs->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
@@ -372,69 +355,79 @@ int open_output_append(ASTNode *node)
     return fd;
 }
 
-void execute_output_append_command(ASTNode* node, char ***env, char ***export,command *cmd, int *exit_status)
+void execute_output_append_command(ASTNode* node, command *cmd, int *exit_status)
 {
-    int fd;
-
-    if (node->outputs) {
-        fd = open_output_append(node);
-        if (fd == -1)
+    if (node->outputs)
+    {
+        cmd->fd = open_output_append(node);
+        if (cmd->fd == -1)
         {
             *exit_status = 1;
             return ;
         }
-        execute_command(node, env, export, cmd, fd, exit_status);
-        close(fd);
+        execute_command(node, cmd, exit_status);
+        close(cmd->fd);
     }
     if (!node->is_last_command)
-        execute_command(node, env, export, cmd, -1, exit_status);
+    {
+        cmd->fd = -1;
+        execute_command(node, cmd, exit_status);
+    }
 }
 
-void execute_output_append_parenthese(ASTNode* node, char ***env, char ***export, command *cmd, int *exit_status)
+void execute_output_append_parenthese(ASTNode* node, command *cmd, int *exit_status)
 {
     int i;
-    int fd;
 
     i = 0;
     if (node->outputs) {
         i++;
-        fd = open_output_append(node);
-        if (fd == -1)
+        cmd->fd = open_output_append(node);
+        if (cmd->fd == -1)
             return ;
-        execute_parenthese(node, env, export, fd, cmd, exit_status);
-        close(fd);
+        execute_parenthese(node, cmd, exit_status);
+        close(cmd->fd);
     }
     if (!node->is_last_command || i == 0)
-        execute_parenthese(node, env, export, -1, cmd, exit_status);
+    {
+        cmd->fd = -1;
+        execute_parenthese(node, cmd, exit_status);
+    }
 }
 
-void processBinaryTree2(ASTNode* node, char ***env, char ***export, command *cmd, int *exit_status)
+void processBinaryTree2(ASTNode* node, command *cmd, int *exit_status)
 {
     if (node == NULL) return;
-    processBinaryTree2(node->left, env, export, cmd, exit_status);
+    processBinaryTree2(node->left, cmd, exit_status);
     if (node->type == NODE_COMMAND)
     {
         if (node->outputs || node->appends)
-            execute_output_append_command(node, env, export, cmd, exit_status);
+            execute_output_append_command(node, cmd, exit_status);
         else
-            execute_command(node, env, export, cmd, -1, exit_status);
+        {
+            cmd->fd = -1;
+            execute_command(node, cmd, exit_status);
+        }
     }
     if (node->type == NODE_PARENTHESE)
     {
-        execute_output_append_parenthese(node, env, export, cmd, exit_status);
+        execute_output_append_parenthese(node, cmd, exit_status);
     }
-    processBinaryTree2(node->right, env, export, cmd, exit_status);
+    processBinaryTree2(node->right, cmd, exit_status);
 }
 
-command *init_command(int test, int test2)
+command *init_command(int dupout, int dupin, char ***env, char ***export)
 {
     command *cmd;
     
     cmd = malloc(sizeof(command));
-    cmd->std_out = test;
-    cmd->std_in = test2;
+    cmd->std_out = dupout;
+    cmd->std_in = dupin;
     cmd->pids = malloc(1024 * sizeof(int));
     cmd->pid_count = 0;
+    cmd->here_doc = 0;
+    cmd->env = env;
+    cmd->export = export;
     return (cmd);
 }
 
@@ -449,52 +442,40 @@ void    free_command(command *cmd, int *exit_status)
     free(cmd);
 }
 
+void execute_logical_and_or(ASTNode* node, char ***env, char ***export, int *exit_status)
+{
+    command *cmd;
+    
+    cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO), env, export);
+    processBinaryTree2(node, cmd, exit_status);
+    free_command(cmd, exit_status);
+}
+
 void expandCommandTrees2(StartNode* startNode, char ***env, char ***export, int *exit_status)
 {
     int i;
 
-    i = 0;
+    i = -1;
     if (!startNode->hasLogical) 
-    {
-        command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
-        processBinaryTree2(startNode->children[0]->left, env, export, cmd, exit_status);
-        free_command(cmd, exit_status);
-    } 
+        execute_logical_and_or(startNode->children[0]->left, env, export, exit_status);
     else 
     {
-        while (i < startNode->childCount) 
+        while (++i < startNode->childCount) 
         {
             if (startNode->children[i]->type == NODE_LOGICAL_AND) 
             {
                 if (startNode->children[i]->left && (*exit_status == 0 || i == 0)) 
-                {
-                    command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
-                    processBinaryTree2(startNode->children[i]->left, env, export, cmd, exit_status);
-                    free_command(cmd, exit_status);
-                }
+                    execute_logical_and_or(startNode->children[i]->left, env, export, exit_status);
                 if (i == 0 && startNode->children[i]->right && *exit_status == 0) 
-                {
-                    command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
-                    processBinaryTree2(startNode->children[i]->right, env, export, cmd, exit_status);
-                    free_command(cmd, exit_status);
-                }
+                    execute_logical_and_or(startNode->children[i]->right, env, export, exit_status);
             }
             else if (startNode->children[i]->type == NODE_LOGICAL_OR) 
             {
                 if (startNode->children[i]->left && (*exit_status != 0 || i == 0)) 
-                {
-                    command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
-                    processBinaryTree2(startNode->children[i]->left, env, export, cmd, exit_status);
-                    free_command(cmd, exit_status);
-                }
+                    execute_logical_and_or(startNode->children[i]->left, env, export, exit_status);
                 if (i == 0 && startNode->children[i]->right && *exit_status != 0) 
-                {
-                    command *cmd = init_command(dup(STDOUT_FILENO), dup(STDIN_FILENO));
-                    processBinaryTree2(startNode->children[i]->right, env, export, cmd, exit_status);
-                    free_command(cmd, exit_status);
-                }
+                    execute_logical_and_or(startNode->children[i]->right, env, export, exit_status);
             }
-            i++;
         }
     }
 }
