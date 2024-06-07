@@ -23,7 +23,6 @@ int	main(int ac, char **av, char **env)
     
     if (ac > 2 && !*av)
 	   return 0;
-
     env2 = clone_env(env);
     export = clone_env(env);
     global_sig = 0;

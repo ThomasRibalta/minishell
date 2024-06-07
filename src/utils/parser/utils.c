@@ -1,137 +1,83 @@
 #include "../../header/minishell.h"
 
-// Function to get a string representation of the node type
-const char* getNodeTypeString(NodeType type) {
-    switch (type) {
-        case NODE_COMMAND: return "COMMAND";
-        case NODE_EMPTY_COMMAND: return "EMPTY COMMAND";
-        case NODE_PARENTHESE: return "PARENTHESE";
-        case NODE_LOGICAL_AND: return "LOGICAL AND";
-        case NODE_LOGICAL_OR: return "LOGICAL OR";
-        case NODE_PIPE: return "PIPE";
-        case NODE_LOGICAL_HOLDER: return "LOGICAL HOLDER";
-        default: return "UNKNOWN";
-    }
-}
-
-void printRedirections(const Redirection* redir) {
-    const char* sep = "";  // Start with no separator
-    while (redir) {
-        printf("%s%s", sep, redir->filename);
-        sep = ", ";  // Update separator after the first item
-        redir = redir->next;
-    }
-}
-
-void printAST(const ASTNode* node, int level) {
-    if (node == NULL) return;
-
-    // Print the node type and value with indentation
-    printf("%*s%s", level * 4, "", getNodeTypeString(node->type));
-    if (node->value) {
-        printf(": %s", node->value);
-    }
-
-    // Print redirections if they exist
-    if (node->inputs || node->outputs || node->appends || node->here_doc) {
-        printf(" [");
-        bool first = true;
-        if (node->inputs) {
-            printf("In: ");
-            printRedirections(node->inputs);
-            first = false;
-        }
-        if (node->outputs) {
-            printf("%sOut: ", first ? "" : "; ");
-            printRedirections(node->outputs);
-            first = false;
-        }
-        if (node->appends) {
-            printf("%sAppend: ", first ? "" : "; ");
-            printRedirections(node->appends);
-            first = false;
-        }
-        if (node->here_doc) {
-            printf("%sHereDoc: ", first ? "" : "; ");
-            printRedirections(node->here_doc);
-        }
-        printf("]");
-    }
-    printf("\n");
-
-    // Recursively print the left and right subtrees
-    printAST(node->left, level + 1);
-    printAST(node->right, level + 1);
-}
-
-void printEntireAST(const StartNode* startNode) {
-    if (!startNode || !startNode->children) {
-        printf("No AST data available to display.\n");
-        return;
-    }
-
-    printf("Complete Abstract Syntax Tree:\n");
-    for (int i = 0; i < startNode->childCount; ++i) {
-        LogicalNode* logicalNode = startNode->children[i];
-
-        // Print logical node at the beginning for all except the first node
-        if (i > 0) {
-            printf("Subtree %d:\n", i + 1);
-            printf("Logical Node (%s):\n", getNodeTypeString(logicalNode->type));
-        }
-
-        if (logicalNode->left) {
-            printf("Left:\n");
-            printAST(logicalNode->left, 1);
-        }
-
-        // Print logical node for the first subtree in the middle
-        if (i == 0 && logicalNode->type != NODE_LOGICAL_HOLDER) {
-            printf("Logical Node (%s):\n", getNodeTypeString(logicalNode->type));
-        }
-
-        if (logicalNode->right) {
-            printf("Right:\n");
-            printAST(logicalNode->right, 1);
-        }
-
-        // Separate the subtrees visually
-        if (i < startNode->childCount - 1) {
-            printf("\n");
-        }
-    }
-}
-
-void	free_lexer(Token **lexer)
+const char* getNodeTypeString(NodeType type)
 {
-	Token *current = *lexer;
-	Token *next = (*lexer)->next;
-
-	while (current->next)
-	{
-		next = current->next;
-		//free(current->value);
-		free(current);
-		current = next;
-	}
-	*lexer = NULL;
+    if (type == NODE_COMMAND)
+        return "COMMAND";
+    else if (type == NODE_EMPTY_COMMAND)
+        return "EMPTY COMMAND";
+    else if (type == NODE_PARENTHESE)
+        return "PARENTHESE";
+    else if (type == NODE_LOGICAL_AND)
+        return "LOGICAL AND";
+    else if (type == NODE_LOGICAL_OR)
+        return "LOGICAL OR";
+    else if (type == NODE_PIPE)
+        return "PIPE";
+    else if (type == NODE_LOGICAL_HOLDER)
+        return "LOGICAL HOLDER";
+    else
+        return "UNKNOWN";
 }
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!! need to free the filename
-void freeRedirectionList(Redirection** list) {
-    if (list == NULL || *list == NULL) {
-        return; // Safety check if list is NULL or already empty
+void init_parsertmp(Parsertmp *parsertmp)
+{
+    parsertmp->root = NULL;
+    parsertmp->last = NULL;
+    parsertmp->currentCommand = NULL;
+    parsertmp->tempInputs = NULL;
+    parsertmp->tempOutputs = NULL;
+}
+
+ASTNode* buildCommandPipeTree(Token** cT)
+{
+    Parsertmp parsertmp;
+
+    init_parsertmp(&parsertmp);
+    while (*cT)
+    {
+        if ((*cT)->type == TOKEN_COMMAND || (*cT)->type == TOKEN_PAREN)
+            type_command_or_parent(cT, &parsertmp.currentCommand, &parsertmp.root, &parsertmp.last);
+        else if ((*cT)->type == TOKEN_PIPE || (*cT)->type == TOKEN_LOGICAL_AND || (*cT)->type == TOKEN_LOGICAL_OR)
+        {
+            handlePipeOrLogicalOperator(cT,  &parsertmp);
+            if ((*cT)->type != TOKEN_PIPE)
+                return (parsertmp.root);
+        }
+        else if ((*cT)->type == TOKEN_IN || (*cT)->type == TOKEN_OUT || (*cT)->type == TOKEN_APPEND || (*cT)->type == TOKEN_HEREDOC)
+            parser_redirection(&parsertmp.tempInputs, &parsertmp.tempOutputs, cT);
+        *cT = (*cT)->next;
     }
-
-    Redirection* current = *list;
-    Redirection* next = NULL;
-
-    while (current != NULL) {
-        next = current->next;
-        //free(current->filename); // Free the filename string allocated with strdup
-        free(current); // Free the redirection node itself
-        current = next;
+    if (parsertmp.currentCommand == NULL && (parsertmp.tempInputs || parsertmp.tempOutputs))
+        init_empty_cmd(&parsertmp);
+    else if (parsertmp.currentCommand)
+    {
+        parsertmp.currentCommand->inputs = parsertmp.tempInputs;
+        parsertmp.currentCommand->outputs = parsertmp.tempOutputs;
     }
+    return (parsertmp.root);
+}
 
-    *list = NULL; // Set the list pointer to NULL after freeing
+void processTokens(StartNode* startNode, Token* tokens)
+{
+    int count;
+    
+    count = -1;
+    while (tokens != NULL)
+    {
+        if (tokens->type == TOKEN_LOGICAL_AND || tokens->type == TOKEN_LOGICAL_OR)
+        {
+            count++;
+            tokens = tokens->next;
+        }
+        else
+        {
+            if (count == -1)
+                startNode->children[0]->left = buildCommandPipeTree(&tokens);
+            else if (count == 0)
+                startNode->children[0]->right = buildCommandPipeTree(&tokens);
+            else
+                startNode->children[count]->left = buildCommandPipeTree(&tokens);
+        }
+    }
 }

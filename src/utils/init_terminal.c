@@ -17,27 +17,22 @@ void  write_terminal_title()
          "|_____/ |_|  |_||______||______||______|\n\n" RESET);
 }
 
-void  edit_shlvl(char **env)
-{
-    while (*env) 
-    {
-        if (ft_strncmp(*env, "SHLVL=", 6) == 0) 
-        {
-            ft_strcpy(*env + 6,ft_itoa(ft_atoi(*env + 6) + 1));
-            break;
-        }
-        env++;
-    }
-}
-
 char **clone_env(char **env) {
-    size_t num_elements = 0;
-    while (env[num_elements] != NULL) {
+    int num_elements;
+    char **env_clone;
+    int i;
+
+    num_elements = 0;
+    i = 0;
+    while (env[num_elements] != NULL)
+    {
         num_elements++;
     }
-    char **env_clone = malloc((num_elements + 1) * sizeof(char *));
-    for (size_t i = 0; i < num_elements; i++) {
-        env_clone[i] = strdup(env[i]);
+    env_clone = malloc((num_elements + 1) * sizeof(char *));
+    while (i < num_elements)
+    {
+        env_clone[i] = ft_strdup(env[i]);
+        i++;
     }
     env_clone[num_elements] = NULL;
     return env_clone;
@@ -60,6 +55,7 @@ void start_terminal(char **env,char **export, int exit_status)
         input = readline(make_readline);
         if (!input) 
         {
+            free(make_readline);
             printf(VIOLET"\n\n FERMETURE DU TERMINAL, A LA PROCHAINE !! \n\n"RESET);
             exit(0);
         }

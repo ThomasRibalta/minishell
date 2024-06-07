@@ -10,7 +10,7 @@ int unset_var2(char ***env, const char *name)
         return (1);
     while (*current)
     {
-        if (strncmp(*current, name, strlen(name)) == 0 && (*current)[strlen(name)] == '=')
+        if (ft_strncmp(*current, name, ft_strlen(name)) == 0 && (*current)[ft_strlen(name)] == '=')
         {
             free(*current);
             next = current + 1;

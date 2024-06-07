@@ -5,18 +5,36 @@ FLAGS = -Wall -Wextra -Werror
 
 SRC_1 = src/utils/parser/expenser.c \
 				src/utils/parser/parser.c \
+				src/utils/parser/parser2.c \
+				src/utils/parser/parser3.c \
 				src/utils/parser/utils.c \
-				src/utils/wildcards.c \
+				src/utils/parser/utils2.c \
+				src/utils/parser/utils3.c \
+				src/utils/wildcards/wildcards.c \
+				src/utils/wildcards/wildcards1.c \
+				src/utils/wildcards/wildcards3.c \
+				src/utils/wildcards/wildcards4.c \
 				src/utils/init_terminal.c \
-				src/utils/executer.c \
-				src/utils/lexer.c \
+				src/utils/exec/executer.c \
+				src/utils/exec/normal_exec.c \
+				src/utils/exec/parenthese_exec.c \
+				src/utils/exec/redirection.c \
+				src/utils/exec/utils.c \
+				src/utils/exec/execv.c \
+				src/utils/lexer/lexer.c \
+				src/utils/lexer/token_manager.c \
+				src/utils/lexer/lexer2.c \
+				src/utils/lexer/symbols.c \
+				src/utils/lexer/gestion_erreur.c \
 				src/utils/prompt_utils.c \
+				src/utils/prompt_utils2.c \
 				src/utils/signal.c \
 				src/utils/builtins/cd.c \
 				src/utils/builtins/echo.c \
 				src/utils/builtins/env.c \
 				src/utils/builtins/exit.c \
 				src/utils/builtins/export.c \
+				src/utils/builtins/export_utils.c \
 				src/utils/builtins/pwd.c \
 				src/utils/builtins/unset.c \
 				src/utils/gnl/get_next_line_utils.c \
