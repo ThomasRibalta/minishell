@@ -57,6 +57,7 @@ int		in_special_zone(char *input, int i);
 int		ft_strnchr(const char *str, int c);
 char	*ft_strnstr(const char *big, const char *little, size_t len);
 int		ft_atoi(const char *nptr);
+int		ft_strcmp(char *value1, char *value2);
 
 void	*ft_calloc(size_t nitems, size_t size);
 char	*ft_strndup(const char *str, size_t n);

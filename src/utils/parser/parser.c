@@ -50,7 +50,7 @@ void	generateandattachbtree(t_startnode *startnode, t_token *tokens)
 	if (!startnode->haslogical)
 	{
 		holder = startnode->children[0];
-		holder->left = buildcommandpipetree(&tokens);
+		holder->left = buildcommand(&tokens);
 	}
 	else
 	{

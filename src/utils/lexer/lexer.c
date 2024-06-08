@@ -11,9 +11,6 @@
 /* ************************************************************************** */
 
 #include "../../header/minishell.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 char	**split_with_symbols(const char *input)
 {
@@ -45,7 +42,7 @@ char	**split_with_symbols(const char *input)
 	return (result);
 }
 
-void	chained_split_prompt(token **list, char **tab)
+void	chained_split_prompt(t_token **list, char **tab)
 {
 	int	j;
 
@@ -53,23 +50,23 @@ void	chained_split_prompt(token **list, char **tab)
 	while (tab[j])
 	{
 		if (tab[j][0] == '(')
-			appendToken(list, TOKEN_PAREN, tab[j]);
+			appendtoken(list, TOKEN_PAREN, tab[j]);
 		else if (tab[j][0] == '|' && tab[j][1] == '\0')
-			appendToken(list, TOKEN_PIPE, tab[j]);
+			appendtoken(list, TOKEN_PIPE, tab[j]);
 		else if (tab[j][0] == '<' && tab[j][1] == '\0')
-			appendToken(list, TOKEN_IN, tab[++j]);
+			appendtoken(list, TOKEN_IN, tab[++j]);
 		else if (tab[j][0] == '>' && tab[j][1] == '\0')
-			appendToken(list, TOKEN_OUT, tab[++j]);
+			appendtoken(list, TOKEN_OUT, tab[++j]);
 		else if (tab[j][0] == '>' && tab[j][1] == '>')
-			appendToken(list, TOKEN_APPEND, tab[++j]);
+			appendtoken(list, TOKEN_APPEND, tab[++j]);
 		else if (tab[j][0] == '<' && tab[j][1] == '<')
-			appendToken(list, TOKEN_HEREDOC, here_doc(tab[++j]));
+			appendtoken(list, TOKEN_HEREDOC, here_doc(tab[++j]));
 		else if (tab[j][0] == '&' && tab[j][1] == '&')
-			appendToken(list, TOKEN_LOGICAL_AND, tab[j]);
+			appendtoken(list, TOKEN_LOGICAL_AND, tab[j]);
 		else if (tab[j][0] == '|' && tab[j][1] == '|')
-			appendToken(list, TOKEN_LOGICAL_OR, tab[j]);
+			appendtoken(list, TOKEN_LOGICAL_OR, tab[j]);
 		else
-			appendToken(list, TOKEN_COMMAND, tab[j]);
+			appendtoken(list, TOKEN_COMMAND, tab[j]);
 		j++;
 	}
 }
@@ -109,7 +106,7 @@ void	lexer(char *input, char ***env, char ***export, int *exit_status)
 {
 	char	**tab_input;
 	char	**symbols;
-	token	*list;
+	t_token	*list;
 
 	list = NULL;
 	if (!input || !check_input_error(input))
@@ -128,5 +125,5 @@ void	lexer(char *input, char ***env, char ***export, int *exit_status)
 	free_tab(tab_input);
 	free(symbols);
 	parser(list, env, export, exit_status);
-	freeTokens(list);
+	freetokens(list);
 }

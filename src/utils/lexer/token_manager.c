@@ -12,7 +12,7 @@
 
 #include "../../header/minishell.h"
 
-t_token	*createt_token(t_tokentype type, const char *value)
+t_token	*createtoken(t_tokentype type, const char *value)
 {
 	t_token	*tokens;
 
@@ -26,7 +26,7 @@ t_token	*createt_token(t_tokentype type, const char *value)
 	return (tokens);
 }
 
-void	appendt_token(t_token **head, t_tokentype type, const char *value)
+void	appendtoken(t_token **head, t_tokentype type, const char *value)
 {
 	t_token	*newtoken;
 	t_token	*current;
