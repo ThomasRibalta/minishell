@@ -1,60 +1,70 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parser.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/08 15:41:14 by toto              #+#    #+#             */
+/*   Updated: 2024/06/08 15:41:33 by toto             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../header/minishell.h"
 
-Redirection* createRedirection(char* filename, int caracteristic)
+t_redirection	*createredirection(char *filename, int caracteristic)
 {
-    Redirection* redir;
+	t_redirection	*redir;
 
-    redir = (Redirection*)malloc(sizeof(Redirection));
-    if (!redir)
-    {
-        perror("Failed to allocate memory for Redirection");
-        exit(EXIT_FAILURE);
-    }
-    redir->filename = filename;
-    redir->caracteristic = caracteristic;
-    redir->next = NULL;
-    return redir;
+	redir = (t_redirection *)malloc(sizeof(t_redirection));
+	if (!redir)
+	{
+		perror("Failed to allocate memory for Redirection");
+		exit(EXIT_FAILURE);
+	}
+	redir->filename = filename;
+	redir->caracteristic = caracteristic;
+	redir->next = NULL;
+	return (redir);
 }
 
-void addRedirection(Redirection** list, Redirection* redir)
+void	addredirection(t_redirection **list, t_redirection *redir)
 {
-    Redirection* current;
+	t_redirection	*current;
 
-    if (*list == NULL)
-        *list = redir;
-    else
-    {
-        current = *list;
-        while (current->next != NULL)
-            current = current->next;
-        current->next = redir;
-    }
+	if (*list == NULL)
+		*list = redir;
+	else
+	{
+		current = *list;
+		while (current->next != NULL)
+			current = current->next;
+		current->next = redir;
+	}
 }
 
-void generateAndAttachBTree(StartNode* startNode, Token* tokens)
+void	generateandattachbtree(t_startnode *startnode, t_token *tokens)
 {
-    LogicalNode* holder;
+	t_logicalnode	*holder;
 
-    if (!startNode->hasLogical)
-    {
-        holder = startNode->children[0];
-        holder->left = buildCommandPipeTree(&tokens);
-    }
-    else
-    {
-        processTokens(startNode, tokens);
-    }
+	if (!startnode->haslogical)
+	{
+		holder = startnode->children[0];
+		holder->left = buildcommandpipetree(&tokens);
+	}
+	else
+	{
+		processtokens(startnode, tokens);
+	}
 }
 
-
-void parser(Token *tokens, char ***env, char ***export, int *exit_status)
+void	parser(t_token *tokens, char ***env, char ***export, int *exit_status)
 {
-    StartNode *startNode;
-    
-    startNode = createAndSetupStartNode(tokens);
-    addLogicalNodeToStartNode(startNode, tokens);
-    generateAndAttachBTree(startNode, tokens);
-    expenser(startNode);
-    executer(startNode, env, export, exit_status);
+	t_startnode	*startnode;
 
+	startnode = createandsetupstartnode(tokens);
+	addlogicalnodetostartnode(startnode, tokens);
+	generateandattachbtree(startnode, tokens);
+	expenser(startnode);
+	executer(startnode, env, export, exit_status);
 }

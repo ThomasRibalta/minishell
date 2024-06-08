@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strncmp.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 12:22:55 by jedurand          #+#    #+#             */
-/*   Updated: 2023/10/02 13:07:29 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/06/08 15:52:52 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,21 +31,12 @@ int	ft_strncmp(const char *str1, const char *str2, size_t n)
 		return (0);
 }
 
-int ft_strcmp(char *value1, char *value2)
+int	ft_strcmp(char *value1, char *value2)
 {
-    while (*value1 && (*value1 == *value2))
-    {
-        value1++;
-        value2++;
-    }
-    return (*(unsigned char *)value1 - *(unsigned char *)value2);
+	while (*value1 && (*value1 == *value2))
+	{
+		value1++;
+		value2++;
+	}
+	return (*(unsigned char *)value1 - *(unsigned char *)value2);
 }
-
-/*#include <stdio.h>
-int	main(void)
-{
-	char str[6] = "salut";
-	char s[6] = "salit";
-	printf("%d", ft_strncmp(str, s, 4));
-	return (0);
-}*/

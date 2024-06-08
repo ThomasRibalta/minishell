@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 12:23:26 by jedurand          #+#    #+#             */
-/*   Updated: 2023/10/03 11:03:04 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/06/08 15:51:54 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 int	ft_strnchr(const char *str, int c)
 {
 	char	*ptr;
-	int	i;
+	int		i;
 
 	ptr = (char *)str;
 	i = 0;

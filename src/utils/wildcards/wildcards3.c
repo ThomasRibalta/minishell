@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   wildcards3.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/08 16:25:14 by toto              #+#    #+#             */
+/*   Updated: 2024/06/08 16:25:15 by toto             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../header/minishell.h"
 
 int	count_files_with_prefix(DIR *dir, const char *prefix)
@@ -8,18 +20,20 @@ int	count_files_with_prefix(DIR *dir, const char *prefix)
 
 	n = 0;
 	prefix_len = ft_strlen(prefix);
-	while ((entry = readdir(dir)) != NULL)
+	entry = readdir(dir);
+	while (entry != NULL)
 	{
 		if (is_special_dir(entry->d_name))
-			continue;
+			continue ;
 		if (ft_strncmp(prefix, entry->d_name, prefix_len) == 0)
 			n++;
+		entry = readdir(dir);
 	}
 	return (n);
 }
 
 int	count_files_with_prefix_and_suffix(DIR *dir, const char *prefix,
-	const char *suffix)
+		const char *suffix)
 {
 	int				n;
 	struct dirent	*entry;
@@ -30,23 +44,25 @@ int	count_files_with_prefix_and_suffix(DIR *dir, const char *prefix,
 	n = 0;
 	prefix_len = ft_strlen(prefix);
 	suffix_len = ft_strlen(suffix);
-	while ((entry = readdir(dir)) != NULL)
+	entry = readdir(dir);
+	while (entry != NULL)
 	{
 		if (is_special_dir(entry->d_name))
-			continue;
+			continue ;
 		name_len = ft_strlen(entry->d_name);
-		if (name_len >= prefix_len + suffix_len &&
-			ft_strncmp(prefix, entry->d_name, prefix_len) == 0 &&
-			ft_strncmp(suffix, entry->d_name + name_len - suffix_len, suffix_len) == 0)
+		if (name_len >= prefix_len + suffix_len && ft_strncmp(prefix,
+				entry->d_name, prefix_len) == 0 && ft_strncmp(suffix,
+				entry->d_name + name_len - suffix_len, suffix_len) == 0)
 			n++;
+		entry = readdir(dir);
 	}
 	return (n);
 }
 
 int	get_number_of_files(char *after, char *before)
 {
-	int		n;
-	DIR		*dir;
+	int	n;
+	DIR	*dir;
 
 	n = 0;
 	dir = opendir(".");
@@ -64,23 +80,23 @@ int	get_number_of_files(char *after, char *before)
 	return (n);
 }
 
-int init_current_dir(int *n, int *i, char ***tab, DIR **dir)
+int	init_current_dir(int *n, int *i, char ***tab, DIR **dir)
 {
-    *n = get_number_of_files(NULL, NULL);
-    if (*n == 0)
-        return (0);
-    *i = 0;
-    *tab = malloc(sizeof(char *) * (*n + 1));
-    if (!(*tab))
-    {
-        perror("malloc");
-        exit(EXIT_FAILURE);
-    }
-    *dir = opendir(".");
-    if (!(*dir))
-    {
-        perror("diropen");
-        exit(EXIT_FAILURE);
-    }
-    return (1);
+	*n = get_number_of_files(NULL, NULL);
+	if (*n == 0)
+		return (0);
+	*i = 0;
+	*tab = malloc(sizeof(char *) * (*n + 1));
+	if (!(*tab))
+	{
+		perror("malloc");
+		exit(EXIT_FAILURE);
+	}
+	*dir = opendir(".");
+	if (!(*dir))
+	{
+		perror("diropen");
+		exit(EXIT_FAILURE);
+	}
+	return (1);
 }

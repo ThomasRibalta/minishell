@@ -1,15 +1,27 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/08 16:02:06 by toto              #+#    #+#             */
+/*   Updated: 2024/06/08 16:02:07 by toto             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../header/minishell.h"
 
-void print_env(char **env, int nb)
+void	print_env(char **env, int nb)
 {
-    int i;
+	int	i;
 
-    i = 0;
-    while (env[i] != NULL)
-    {
-        if (nb == 1)
-            printf("declare -x ");
-        printf("%s\n", env[i]);
-        i++;
-    }
+	i = 0;
+	while (env[i] != NULL)
+	{
+		if (nb == 1)
+			printf("declare -x ");
+		printf("%s\n", env[i]);
+		i++;
+	}
 }

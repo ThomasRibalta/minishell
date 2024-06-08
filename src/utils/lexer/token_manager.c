@@ -1,46 +1,62 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   token_manager.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/08 14:43:47 by toto              #+#    #+#             */
+/*   Updated: 2024/06/08 14:43:49 by toto             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../header/minishell.h"
 
-Token* createToken(TokenType type, const char* value)
+t_token	*createt_token(t_tokentype type, const char *value)
 {
-    Token* token;
-    
-    token = (Token*)malloc(sizeof(Token));
-    token->type = type;
-    token->value = value != NULL ? strdup(value) : NULL;
-    token->next = NULL;
-    return token;
+	t_token	*tokens;
+
+	tokens = (t_token *)malloc(sizeof(t_token));
+	tokens->type = type;
+	if (value != NULL)
+		tokens->value = strdup(value);
+	else
+		tokens->value = NULL;
+	tokens->next = NULL;
+	return (tokens);
 }
 
-void appendToken(Token** head, TokenType type, const char* value)
+void	appendt_token(t_token **head, t_tokentype type, const char *value)
 {
-    Token* newToken;
-    Token* current;
-    
-    newToken = createToken(type, value);
-    if (*head == NULL) 
-    {
-        *head = newToken;
-    }
-    else
-    {
-        current = *head;
-        while (current->next != NULL)
-        {
-            current = current->next;
-        }
-        current->next = newToken;
-    }
+	t_token	*newtoken;
+	t_token	*current;
+
+	newtoken = createtoken(type, value);
+	if (*head == NULL)
+	{
+		*head = newtoken;
+	}
+	else
+	{
+		current = *head;
+		while (current->next != NULL)
+		{
+			current = current->next;
+		}
+		current->next = newtoken;
+	}
 }
 
-void freeTokens(Token* head)
+void	freetokens(t_token *head)
 {
-    Token* tmp;
+	t_token	*tmp;
 
-    while (head != NULL)
-    {
-        tmp = head;
-        head = head->next;
-        if (tmp->value != NULL) free(tmp->value);
-        free(tmp);
-    }
+	while (head != NULL)
+	{
+		tmp = head;
+		head = head->next;
+		if (tmp->value != NULL)
+			free(tmp->value);
+		free(tmp);
+	}
 }

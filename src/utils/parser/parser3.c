@@ -1,85 +1,98 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parser3.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/08 15:26:23 by toto              #+#    #+#             */
+/*   Updated: 2024/06/08 15:29:19 by toto             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../header/minishell.h"
 
-int countLogicalNodes(Token* tokens)
+int	countlogicalnodes(t_token *tokens)
 {
-    int count;
-    Token* current;
+	int		count;
+	t_token	*current;
 
-    count = 0;
-    current = tokens;
-    while (current != NULL)
-    {
-        if (current->type == TOKEN_LOGICAL_AND || current->type == TOKEN_LOGICAL_OR)
-            count++;
-        current = current->next;
-    }
-    return count;
+	count = 0;
+	current = tokens;
+	while (current != NULL)
+	{
+		if (current->type == TOKEN_LOGICAL_AND
+			|| current->type == TOKEN_LOGICAL_OR)
+			count++;
+		current = current->next;
+	}
+	return (count);
 }
 
-StartNode* createAndSetupStartNode(Token* tokens)
+t_startnode	*createandsetupstartnode(t_token *tokens)
 {
-    int logicalNodeCount;
-    StartNode* startNode;
+	int			logicalnodecount;
+	t_startnode	*startnode;
 
-    startNode = (StartNode*)malloc(sizeof(StartNode));
-    if (!startNode)
-        exit(EXIT_FAILURE);
-    startNode->hasLogical = false;
-    startNode->childCount = 0;
-    startNode->children = NULL;
-    logicalNodeCount = countLogicalNodes(tokens);
-    if (logicalNodeCount > 0)
-    {
-        startNode->hasLogical = true;
-        startNode->childCount = logicalNodeCount;
-    }
-    else
-        startNode->childCount = 1;
-	startNode->children = (LogicalNode**)malloc(sizeof(LogicalNode*) * startNode->childCount);
-	if (!startNode->children)
-    {
-		perror("Failed to allocate memory for logical node pointers in StartNode");
-		free(startNode);
+	startnode = (t_startnode *)malloc(sizeof(t_startnode));
+	if (!startnode)
+		exit(EXIT_FAILURE);
+	startnode->haslogical = false;
+	startnode->childcount = 0;
+	startnode->children = NULL;
+	logicalnodecount = countlogicalnodes(tokens);
+	if (logicalnodecount > 0)
+	{
+		startnode->haslogical = true;
+		startnode->childcount = logicalnodecount;
+	}
+	else
+		startnode->childcount = 1;
+	startnode->children = (t_logicalnode **)malloc(sizeof(t_logicalnode *)
+			* startnode->childcount);
+	if (!startnode->children)
+	{
+		free(startnode);
 		exit(EXIT_FAILURE);
 	}
-    return startNode;
+	return (startnode);
 }
 
-ASTNode* createASTNode(NodeType type, char* value)
+t_astnode	*createastnode(t_nodetype type, char *value)
 {
-    ASTNode* node;
+	t_astnode	*node;
 
-    node = (ASTNode*)malloc(sizeof(ASTNode));
-    if (!node)
-    {
-        perror("Failed to allocate memory for ASTNode");
-        exit(EXIT_FAILURE);
-    }
-    node->type = type;
-    node->value = value;
-    node->left = NULL;
-    node->right = NULL;
-    node->inputs = NULL;
-    node->outputs = NULL;
-    node->appends = NULL;
+	node = (t_astnode *)malloc(sizeof(t_astnode));
+	if (!node)
+	{
+		perror("Failed to allocate memory for ASTNode");
+		exit(EXIT_FAILURE);
+	}
+	node->type = type;
+	node->value = value;
+	node->left = NULL;
+	node->right = NULL;
+	node->inputs = NULL;
+	node->outputs = NULL;
+	node->appends = NULL;
 	node->here_doc = NULL;
-	node->builtIn = false;
+	node->builtin = false;
 	node->is_last_command = false;
-    return node;
+	return (node);
 }
 
-LogicalNode* createLogicalNode(NodeType type)
+t_logicalnode	*createlogicalnode(t_nodetype type)
 {
-    LogicalNode* node;
+	t_logicalnode	*node;
 
-    node = (LogicalNode*)malloc(sizeof(LogicalNode));
-    if (!node)
-    {
-        perror("Failed to allocate memory for LogicalNode");
-        exit(EXIT_FAILURE);
-    }
-    node->type = type;
-    node->left = NULL;
-    node->right = NULL;
-    return node;
+	node = (t_logicalnode *)malloc(sizeof(t_logicalnode));
+	if (!node)
+	{
+		perror("Failed to allocate memory for LogicalNode");
+		exit(EXIT_FAILURE);
+	}
+	node->type = type;
+	node->left = NULL;
+	node->right = NULL;
+	return (node);
 }

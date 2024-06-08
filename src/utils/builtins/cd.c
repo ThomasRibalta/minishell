@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cd.c                                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/08 15:58:55 by toto              #+#    #+#             */
+/*   Updated: 2024/06/08 15:58:57 by toto             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../header/minishell.h"
 
 static char	*get_target_path(char **tab, char **env)
 {
 	char	*path;
-    char	*pwd;
+	char	*pwd;
 
 	if (len_tab(tab) > 1)
 	{
@@ -39,11 +51,11 @@ static int	change_directory(char *path)
 	return (0);
 }
 
-static int	handle_cd_errors()
+static int	handle_cd_errors(void)
 {
 	char	*pwd;
-    
-    pwd = get_cwd(0);
+
+	pwd = get_cwd(0);
 	if (pwd[0] == '\0')
 	{
 		ft_putstr_fd("cd: error retrieving current directory: ", 2);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strdup.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 12:23:20 by jedurand          #+#    #+#             */
-/*   Updated: 2023/10/02 13:29:16 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/06/08 15:50:52 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ char	*ft_strdup(const char *str)
 	return ((char *)ft_memcpy(new, str, len));
 }
 
-char *ft_strndup(const char *str, size_t n)
+char	*ft_strndup(const char *str, size_t n)
 {
 	char	*new;
 	size_t	len;
