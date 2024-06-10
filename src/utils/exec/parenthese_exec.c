@@ -12,20 +12,19 @@
 
 #include "../../header/minishell.h"
 
-int	execute_builtin(t_command *cmd, char **param, t_astnode *node,
-	int *exit_status)
+int	execute_builtin(t_command *cmd, char **param, t_astnode *node)
 {
 	if (ft_strcmp(clean_quote(param[0]), "exit") == 0 && node->is_last_command)
-		exit_program(param + 1);
+		exit_program(param + 1, cmd);
 	else if ((ft_strcmp(clean_quote(param[0]), "cd") == 0
 			|| ft_strcmp(clean_quote(param[0]), "cd") == 0)
 		&& node->is_last_command)
-		*exit_status = cd(param + 1, cmd->env);
+		*cmd->mainstruct.exit_status = cd(param + 1, cmd->mainstruct.env);
 	else if (ft_strcmp(clean_quote(param[0]), "export") == 0
 		&& param[1] != NULL)
-		*exit_status = export_var(cmd->env, cmd->export, param + 1);
+		*cmd->mainstruct.exit_status = export_var(cmd->mainstruct.env, cmd->mainstruct.export, param + 1);
 	else if (ft_strcmp(clean_quote(param[0]), "unset") == 0)
-		*exit_status = unset_var(cmd->env, param + 1);
+		*cmd->mainstruct.exit_status = unset_var(cmd->mainstruct.env, param + 1);
 	else
 		return (1);
 	return (0);
@@ -55,7 +54,7 @@ int	execute_fork_builtin(char **env, char **export, char **param)
 	exit(0);
 }
 
-int	execute_parenthese2(t_command *cmd, t_astnode *node, int *exit_status)
+int	execute_parenthese2(t_command *cmd, t_astnode *node)
 {
 	int	here_doc;
 
@@ -68,17 +67,17 @@ int	execute_parenthese2(t_command *cmd, t_astnode *node, int *exit_status)
 	if (cmd->fd == -1)
 		cmd->fd = cmd->p_id[1];
 	if (node->inputs)
-		here_doc = redirection_in(node, exit_status, cmd);
+		here_doc = redirection_in(node, cmd->mainstruct.exit_status, cmd);
 	if (here_doc == 2)
 		return (0);
 	return (here_doc);
 }
 
-void	execute_parenthese(t_astnode *node, t_command *cmd, int *exit_status)
+void	execute_parenthese(t_astnode *node, t_command *cmd)
 {
 	pid_t	pid;
 
-	cmd->here_doc = execute_parenthese2(cmd, node, exit_status);
+	cmd->here_doc = execute_parenthese2(cmd, node);
 	if (cmd->here_doc == 0)
 		return ;
 	pid = fork();
@@ -90,8 +89,7 @@ void	execute_parenthese(t_astnode *node, t_command *cmd, int *exit_status)
 	if (pid == 0)
 	{
 		handle_child_process(node, cmd);
-		lexer(remove_parenthese(node->value), cmd->env, cmd->export,
-			exit_status);
+		lexer(remove_parenthese(node->value), cmd->mainstruct);
 		exit(EXIT_SUCCESS);
 	}
 	else
@@ -101,8 +99,7 @@ void	execute_parenthese(t_astnode *node, t_command *cmd, int *exit_status)
 	}
 }
 
-void	execute_output_append_parenthese(t_astnode *node, t_command *cmd,
-		int *exit_status)
+void	execute_output_append_parenthese(t_astnode *node, t_command *cmd)
 {
 	int	i;
 
@@ -113,12 +110,12 @@ void	execute_output_append_parenthese(t_astnode *node, t_command *cmd,
 		cmd->fd = open_output_append(node);
 		if (cmd->fd == -1)
 			return ;
-		execute_parenthese(node, cmd, exit_status);
+		execute_parenthese(node, cmd);
 		close(cmd->fd);
 	}
 	if (!node->is_last_command || i == 0)
 	{
 		cmd->fd = -1;
-		execute_parenthese(node, cmd, exit_status);
+		execute_parenthese(node, cmd);
 	}
 }

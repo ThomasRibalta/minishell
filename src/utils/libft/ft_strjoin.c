@@ -31,6 +31,8 @@ char	*ft_strjoin(char const *s1, char const *s2)
 		return (NULL);
 	ft_strlcpy(new, s1, len1 + 1);
 	ft_strlcat(new, s2, len1 + len2 + 1);
+	free((char *)s1);
+	free((char *)s2);
 	return (new);
 }
 

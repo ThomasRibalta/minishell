@@ -102,7 +102,7 @@ char	**re_build_with_redir(char **tab_input)
 	return (tab_input);
 }
 
-void	lexer(char *input, char ***env, char ***export, int *exit_status)
+void	lexer(char *input, t_mainstruct mainstruct)
 {
 	char	**tab_input;
 	char	**symbols;
@@ -117,13 +117,13 @@ void	lexer(char *input, char ***env, char ***export, int *exit_status)
 	tab_input = tab_clean(tab_input);
 	if (contains_invalid_sequences(tab_input, len_tab(tab_input), symbols))
 	{
-		*exit_status = 2;
+		*mainstruct.exit_status = 2;
 		free_tab(tab_input);
 		return ;
 	}
 	chained_split_prompt(&list, tab_input);
 	free_tab(tab_input);
 	free(symbols);
-	parser(list, env, export, exit_status);
+	parser(list, mainstruct);
 	freetokens(list);
 }

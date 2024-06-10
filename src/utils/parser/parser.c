@@ -58,7 +58,7 @@ void	generateandattachbtree(t_startnode *startnode, t_token *tokens)
 	}
 }
 
-void	parser(t_token *tokens, char ***env, char ***export, int *exit_status)
+void	parser(t_token *tokens, t_mainstruct mainstruct)
 {
 	t_startnode	*startnode;
 
@@ -66,5 +66,5 @@ void	parser(t_token *tokens, char ***env, char ***export, int *exit_status)
 	addlogicalnodetostartnode(startnode, tokens);
 	generateandattachbtree(startnode, tokens);
 	expenser(startnode);
-	executer(startnode, env, export, exit_status);
+	executer(startnode, mainstruct);
 }

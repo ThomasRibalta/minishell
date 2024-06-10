@@ -44,6 +44,7 @@ char	*clean_quote(char *input)
 {
 	int	i;
 	int	tmp;
+	char *tmp_input;
 
 	i = 0;
 	tmp = 0;
@@ -52,19 +53,23 @@ char	*clean_quote(char *input)
 		if (input[i] == '"' && ft_strnchr(input + i + 1, '"') != -1)
 		{
 			tmp = i + 1 + ft_strnchr(input + i + 1, '"');
-			input = ft_strjoin(ft_strjoin(ft_substr(input, 0, i),
+			tmp_input = ft_strjoin(ft_strjoin(ft_substr(input, 0, i),
 						ft_substr(input, i + 1, ft_strnchr(input + i + 1,
 								'"'))), ft_substr(input + 1, ft_strnchr(input
 							+ i + 1, '"') + i + 1, ft_strlen(input)));
+			free(input);
+			input = tmp_input;
 			i = tmp - 2;
 		}
 		else if (input[i] == 39 && ft_strnchr(input + i + 1, 39) != -1)
 		{
 			tmp = i + 1 + ft_strnchr(input + i + 1, 39);
-			input = ft_strjoin(ft_strjoin(ft_substr(input, 0, i),
+			tmp_input = ft_strjoin(ft_strjoin(ft_substr(input, 0, i),
 						ft_substr(input, i + 1, ft_strnchr(input + i + 1, 39))),
 					ft_substr(input + 1, ft_strnchr(input + i + 1, 39) + i + 1,
 						ft_strlen(input)));
+			free(input);
+			input = tmp_input;
 			i = tmp - 2;
 		}
 		i++;
@@ -72,21 +77,20 @@ char	*clean_quote(char *input)
 	return (input);
 }
 
-char	*clean_prompt(char *input, char ***env, char ***export,
-		int *exit_status)
+char	*clean_prompt(char *input, t_mainstruct mainstruct)
 {
 	char	*prompt;
 
 	prompt = clean_white_space(input);
-	lexer(prompt, env, export, exit_status);
+	lexer(prompt, mainstruct);
 	return (prompt);
 }
 
-void	check_prompt(char *input, char ***env, char ***export, int *exit_status)
+void	check_prompt(char *input, t_mainstruct mainstruct)
 {
 	char	*prompt;
 
-	prompt = clean_prompt(input, env, export, exit_status);
+	prompt = clean_prompt(input, mainstruct);
 	if (prompt)
 		free(prompt);
 }

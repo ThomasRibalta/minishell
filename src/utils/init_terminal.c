@@ -57,12 +57,27 @@ void	init_terminal(char **env)
 	write_terminal_title();
 }
 
+t_mainstruct intialize_mainstruct(char ***env, char ***export, int *exit_status, int *exit)
+{
+	t_mainstruct	mainstruct;
+
+	mainstruct.env = env;
+	mainstruct.export = export;
+	mainstruct.exit_status = exit_status;
+	mainstruct.exit = exit;
+	return (mainstruct);
+}
+
 void	start_terminal(char **env, char **export, int exit_status)
 {
 	char	*input;
 	char	*make_readline;
+	t_mainstruct  mainstruct;
+	int exite;
 
-	while (1)
+	exite = -1;
+	mainstruct = intialize_mainstruct(&env, &export, &exit_status, &exite);
+	while (*mainstruct.exit == -1)
 	{
 		make_readline = ft_strjoin(ft_strjoin(ft_strdup(VERT "→ " BLEU),
 					get_cwd(1)), ft_strdup(VIOLET " > " RESET));
@@ -70,12 +85,17 @@ void	start_terminal(char **env, char **export, int exit_status)
 		if (!input)
 		{
 			free(make_readline);
+			free_tab(*mainstruct.env);
+			free_tab(*mainstruct.export);
 			printf(VIOLET "\n\n FERMETURE DU TERMINAL,"
 				" A LA PROCHAINE !! \n\n" RESET);
 			exit(0);
 		}
 		add_history(input);
-		check_prompt(input, &env, &export, &exit_status);
+		check_prompt(input, mainstruct);
 		free(make_readline);
 	}
+	free_tab(*mainstruct.env);
+	free_tab(*mainstruct.export);
+	exit(*mainstruct.exit);
 }

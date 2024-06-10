@@ -49,7 +49,7 @@ void	make_pipe(t_command *cmd, t_astnode *node)
 		ft_strlen(node->inputs->filename));
 }
 
-t_command	*init_command(int dupout, int dupin, char ***env, char ***export)
+t_command	*init_command(int dupout, int dupin, t_mainstruct mainstruct)
 {
 	t_command	*cmd;
 
@@ -59,12 +59,11 @@ t_command	*init_command(int dupout, int dupin, char ***env, char ***export)
 	cmd->pids = malloc(1024 * sizeof(int));
 	cmd->pid_count = 0;
 	cmd->here_doc = 0;
-	cmd->env = env;
-	cmd->export = export;
+	cmd->mainstruct = mainstruct;
 	return (cmd);
 }
 
-void	free_command(t_command *cmd, int *exit_status)
+void	free_command(t_command *cmd)
 {
 	int	tmp;
 	int	j;
@@ -75,7 +74,7 @@ void	free_command(t_command *cmd, int *exit_status)
 		waitpid(cmd->pids[j], &tmp, 0);
 		j++;
 	}
-	*exit_status = MY_WEXITSTATUS(tmp);
+	*cmd->mainstruct.exit_status = MY_WEXITSTATUS(tmp);
 	free(cmd->pids);
 	free(cmd);
 }

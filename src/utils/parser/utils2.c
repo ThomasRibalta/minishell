@@ -74,7 +74,7 @@ char	*get_word_env(char *tmp, int i, int *j, char **env)
 	char	*word;
 
 	word = ft_substr(tmp + i + 1, 0, *j);
-	while ((in_env(ft_strjoin(word, ft_strdup("=")), env) != 1 && tmp[i + *j]
+	while ((in_env(ft_strjoin(ft_strdup(word), ft_strdup("=")), env) != 1 && tmp[i + *j]
 			&& tmp[i + *j] != ' ' && tmp[i + *j] != '$'))
 	{
 		free(word);

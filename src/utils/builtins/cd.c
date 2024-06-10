@@ -28,7 +28,7 @@ static char	*get_target_path(char **tab, char **env)
 		{
 			pwd = get_cwd(0);
 			path = ft_strjoin(pwd, "/");
-			path = ft_strjoin(path, tab[0]);
+			path = ft_strjoin(path, ft_strdup(tab[0]));
 			free(pwd);
 		}
 		else

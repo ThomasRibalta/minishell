@@ -36,9 +36,8 @@ char	*check_path(char **paths, char *name)
 	}
 	while (paths[i])
 	{
-		tmp = ft_strjoin(paths[i], "/");
-		join = ft_strjoin(tmp, name);
-		free(tmp);
+		tmp = ft_strjoin(ft_strdup(paths[i]), ft_strdup("/"));
+		join = ft_strjoin(tmp, ft_strdup(name));
 		if (access(join, F_OK | X_OK) == 0)
 			return (join);
 		free(join);

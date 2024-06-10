@@ -18,7 +18,8 @@ char	*replacesubstring(char *str, int start, int end, char *replacement)
 	char	*tmp;
 
 	new_str = ft_strjoin(ft_substr(str, 0, start), replacement);
-	tmp = ft_strjoin(new_str, str + end);
+	tmp = ft_strjoin(new_str, ft_strdup(str + end));
+	free(str);
 	free(new_str);
 	return (tmp);
 }
@@ -41,10 +42,12 @@ void	replace_variable(char **tmp, int *i, char **env, int *exit_status)
 		free(word);
 		if (value)
 			*tmp = replacesubstring(*tmp, *i, *i + j, value);
+		free(value);
 	}
 	else
 	{
-		new_str = ft_strjoin(ft_substr(*tmp, 0, *i), (*tmp) + *i + j);
+		new_str = ft_strjoin(ft_substr(*tmp, 0, *i), ft_strdup((*tmp) + *i + j));
+		free(*tmp);
 		*tmp = new_str;
 		(*i)--;
 	}

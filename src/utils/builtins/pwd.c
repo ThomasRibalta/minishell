@@ -15,17 +15,20 @@
 char	*get_cwd(int i)
 {
 	char	*cwd;
+	char	*tmp;
 
 	cwd = malloc(1024);
 	if (!cwd)
 		return ("Erreur");
 	if (!getcwd(cwd, 1024))
 		return ("");
+	tmp = cwd;
 	if (i == 1 && ft_strlen(cwd) >= ft_strlen(getenv("HOME")))
 	{
-		cwd = ft_strjoin("~", cwd + ft_strlen(getenv("HOME")));
+		tmp = ft_strjoin(ft_strdup("~"), ft_strdup(cwd + ft_strlen(getenv("HOME"))));
+		free(cwd);
 	}
-	return (cwd);
+	return (tmp);
 }
 
 char	*pwd(int i)
