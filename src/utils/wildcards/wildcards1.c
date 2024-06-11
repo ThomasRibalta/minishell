@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 16:21:12 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 16:24:15 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 21:36:21 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ char	**fusionner_tableaux(char **tab1, char **tab2, int i)
 	char	**tableau_fusionne;
 	int		j;
 
-	taille_total = len_tab(tab1) + len_tab(tab2) + 1;
+	taille_total = len_tab(tab1) + len_tab(tab2);
 	j = -1;
 	tableau_fusionne = (char **)malloc(taille_total * sizeof(char *));
 	if (tableau_fusionne == NULL)
@@ -51,13 +51,14 @@ int	count_all_files(DIR *dir)
 	struct dirent	*entry;
 
 	n = 0;
-	entry = readdir(dir);
-	while (entry != NULL)
+	while (1)
 	{
+		entry = readdir(dir);
+		if (entry == NULL)
+			break ;
 		if (is_special_dir(entry->d_name))
 			continue ;
 		n++;
-		entry = readdir(dir);
 	}
 	return (n);
 }
@@ -71,16 +72,17 @@ int	count_files_with_suffix(DIR *dir, const char *suffix)
 
 	n = 0;
 	suffix_len = ft_strlen(suffix);
-	entry = readdir(dir);
-	while (entry != NULL)
+	while (1)
 	{
+		entry = readdir(dir);
+		if (entry == NULL)
+			break ;
 		if (is_special_dir(entry->d_name))
 			continue ;
 		name_len = ft_strlen(entry->d_name);
 		if (name_len >= suffix_len && ft_strncmp(suffix, entry->d_name
 				+ name_len - suffix_len, suffix_len) == 0)
 			n++;
-		entry = readdir(dir);
 	}
 	return (n);
 }

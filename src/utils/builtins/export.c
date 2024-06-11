@@ -6,17 +6,16 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 15:58:47 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 15:58:48 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 18:24:03 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../header/minishell.h"
 
-int	add_new_entry(char ***env, const char *name, const char *value)
+int	add_new_entry(char ***env, char *name, char *value)
 {
 	char	**current;
 	int		num_entries;
-	char	**new_env;
 
 	current = *env;
 	num_entries = 0;
@@ -25,19 +24,11 @@ int	add_new_entry(char ***env, const char *name, const char *value)
 		num_entries++;
 		current++;
 	}
-	new_env = init_new_env(env, num_entries, name, value);
-	if (!new_env)
-		return (1);
-	ft_strcpy(new_env[num_entries], name);
-	ft_strcpy(new_env[num_entries] + ft_strlen(name), "=");
-	ft_strcpy(new_env[num_entries] + ft_strlen(name) + 1, value);
-	new_env[num_entries + 1] = NULL;
-	free(*env);
-	*env = new_env;
+	init_new_env(env, num_entries, name, value);
 	return (0);
 }
 
-int	export_var2(char ***env, const char *name, const char *value)
+int	export_var2(char ***env, char *name, char *value)
 {
 	char	**current;
 
@@ -53,6 +44,20 @@ int	export_var2(char ***env, const char *name, const char *value)
 	return (add_new_entry(env, name, value));
 }
 
+int	get_egal(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == '=')
+			return (i);
+		i++;
+	}
+	return (i);
+}
+
 int	export_var(char ***env, char ***export, char **tab)
 {
 	int	i;
@@ -63,13 +68,13 @@ int	export_var(char ***env, char ***export, char **tab)
 	while (tab[i])
 	{
 		if (!ft_strchr(tab[i], '='))
-			status = export_var2(export, tab[i], "");
+			status = export_var2(export, ft_strdup(tab[i]), ft_strdup(""));
 		else
 		{
-			status = export_var2(env, ft_strndup(tab[i], ft_strchr(tab[i], '=')
-						- tab[i]), ft_strchr(tab[i], '=') + 1);
-			status = export_var2(export, ft_strndup(tab[i], ft_strchr(tab[i],
-							'=') - tab[i]), ft_strchr(tab[i], '=') + 1);
+			status = export_var2(env, ft_strndup(tab[i], get_egal(tab[i])),
+					ft_strdup(tab[i] + (get_egal(tab[i]) + 1)));
+			status = export_var2(export, ft_strndup(tab[i], get_egal(tab[i])),
+					ft_strdup(tab[i] + (get_egal(tab[i]) + 1)));
 		}
 		i++;
 	}

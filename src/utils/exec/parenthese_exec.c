@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 16:16:45 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 16:21:56 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 21:35:44 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,36 +19,45 @@ int	execute_builtin(t_command *cmd, char **param, t_astnode *node)
 	else if ((ft_strcmp(clean_quote(param[0]), "cd") == 0
 			|| ft_strcmp(clean_quote(param[0]), "cd") == 0)
 		&& node->is_last_command)
-		*cmd->mainstruct.exit_status = cd(param + 1, cmd->mainstruct.env);
+		*cmd->mainstruct.exit_status = cd(param + 1, cmd->mainstruct.env,
+				cmd->mainstruct.export);
 	else if (ft_strcmp(clean_quote(param[0]), "export") == 0
 		&& param[1] != NULL)
-		*cmd->mainstruct.exit_status = export_var(cmd->mainstruct.env, cmd->mainstruct.export, param + 1);
+		*cmd->mainstruct.exit_status = export_var(cmd->mainstruct.env,
+				cmd->mainstruct.export, param + 1);
 	else if (ft_strcmp(clean_quote(param[0]), "unset") == 0)
-		*cmd->mainstruct.exit_status = unset_var(cmd->mainstruct.env, param + 1);
+		*cmd->mainstruct.exit_status = unset_var(cmd->mainstruct.env,
+				cmd->mainstruct.export, param + 1);
 	else
 		return (1);
+	free_tab(param);
 	return (0);
 }
 
-int	execute_fork_builtin(char **env, char **export, char **param)
+int	execute_fork_builtin(char **env, char **export, char **par)
 {
-	if (ft_strcmp(clean_quote(param[0]), "echo") == 0
-		|| ft_strcmp(clean_quote(param[0]), "/bin/echo") == 0)
-		echo(param);
-	else if (ft_strcmp(clean_quote(param[0]), "env") == 0
-		|| ft_strcmp(clean_quote(param[0]), "/bin/env") == 0)
+	char	*pwd2;
+
+	if (ft_strcmp(clean_quote(par[0]), "echo") == 0
+		|| ft_strcmp(clean_quote(par[0]), "/bin/echo") == 0)
+		echo(par);
+	else if (ft_strcmp(clean_quote(par[0]), "env") == 0
+		|| ft_strcmp(clean_quote(par[0]), "/bin/env") == 0)
 		print_env(env, 0);
-	else if (ft_strcmp(clean_quote(param[0]), "export") == 0
-		&& param[1] == NULL)
+	else if (ft_strcmp(clean_quote(par[0]), "export") == 0 && par[1] == NULL)
 		print_env(export, 1);
-	else if (ft_strcmp(clean_quote(param[0]), "cd") == 0
-		|| ft_strcmp(clean_quote(param[0]), "cd") == 0)
+	else if (ft_strcmp(clean_quote(par[0]), "cd") == 0
+		|| ft_strcmp(clean_quote(par[0]), "cd") == 0)
 		exit(0);
-	else if (ft_strcmp(clean_quote(param[0]), "unset") == 0)
+	else if (ft_strcmp(clean_quote(par[0]), "unset") == 0)
 		exit(0);
-	else if (ft_strcmp(clean_quote(param[0]), "pwd") == 0
-		|| ft_strcmp(clean_quote(param[0]), "/bin/pwd") == 0)
-		printf("%s\n", pwd(0));
+	else if (ft_strcmp(clean_quote(par[0]), "pwd") == 0
+		|| ft_strcmp(clean_quote(par[0]), "/bin/pwd") == 0)
+	{
+		pwd2 = pwd(0);
+		printf("%s\n", pwd2);
+		free(pwd2);
+	}
 	else
 		return (1);
 	exit(0);
@@ -69,16 +78,17 @@ int	execute_parenthese2(t_command *cmd, t_astnode *node)
 	if (node->inputs)
 		here_doc = redirection_in(node, cmd->mainstruct.exit_status, cmd);
 	if (here_doc == 2)
-		return (0);
+		return (2);
 	return (here_doc);
 }
 
 void	execute_parenthese(t_astnode *node, t_command *cmd)
 {
 	pid_t	pid;
+	char	*tmp;
 
 	cmd->here_doc = execute_parenthese2(cmd, node);
-	if (cmd->here_doc == 0)
+	if (cmd->here_doc == 2)
 		return ;
 	pid = fork();
 	if (pid == -1)
@@ -89,7 +99,9 @@ void	execute_parenthese(t_astnode *node, t_command *cmd)
 	if (pid == 0)
 	{
 		handle_child_process(node, cmd);
-		lexer(remove_parenthese(node->value), cmd->mainstruct);
+		tmp = remove_parenthese(node->value);
+		lexer(tmp, cmd->mainstruct);
+		free(tmp);
 		exit(EXIT_SUCCESS);
 	}
 	else
@@ -101,11 +113,18 @@ void	execute_parenthese(t_astnode *node, t_command *cmd)
 
 void	execute_output_append_parenthese(t_astnode *node, t_command *cmd)
 {
-	int	i;
+	int				i;
+	t_redirection	*tmp;
 
 	i = 0;
 	if (node->outputs)
 	{
+		while (node->outputs->next)
+		{
+			tmp = node->outputs;
+			node->outputs = node->outputs->next;
+			free(tmp);
+		}
 		i++;
 		cmd->fd = open_output_append(node);
 		if (cmd->fd == -1)

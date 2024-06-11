@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 16:19:00 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 16:19:02 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 21:41:02 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,24 @@ char	**check_middle_wildcard(char **tab_current_file, int i, int j)
 	return (tab_current_file);
 }
 
+char	**handle_wildcard(char **tab_current_file, int i, int j)
+{
+	if (only_char(tab_current_file[i], '*') == ft_strlen(tab_current_file[i])
+		&& tab_current_file[i][0] == '*')
+	{
+		return (check_full_wildcard(tab_current_file, i));
+	}
+	else if (tab_current_file[i][j] == '*' && j == 0)
+	{
+		return (check_leading_wildcard(tab_current_file, i));
+	}
+	else if (tab_current_file[i][j] == '*')
+	{
+		return (check_middle_wildcard(tab_current_file, i, j));
+	}
+	return (tab_current_file);
+}
+
 char	**check_wildcard(char **split_nodeValue)
 {
 	int		i;
@@ -61,15 +79,7 @@ char	**check_wildcard(char **split_nodeValue)
 	{
 		while (tab_current_file[i][++j])
 		{
-			if (only_char(tab_current_file[i],
-					'*') == ft_strlen(tab_current_file[i])
-				&& tab_current_file[i][0] == '*')
-				tab_current_file = check_full_wildcard(tab_current_file, i);
-			else if (tab_current_file[i][j] == '*' && j == 0)
-				tab_current_file = check_leading_wildcard(tab_current_file, i);
-			else if (tab_current_file[i][j] == '*')
-				tab_current_file = check_middle_wildcard(tab_current_file, i,
-						j);
+			tab_current_file = handle_wildcard(tab_current_file, i, j);
 			if ((only_char(tab_current_file[i],
 						'*') == ft_strlen(tab_current_file[i])
 					&& tab_current_file[i][0] == '*')

@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:18:49 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 14:24:28 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 21:19:29 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ char	**split_with_symbols(const char *input)
 	count = 0;
 	while (input[i])
 	{
-		symbol_length = 0;
 		if (is_symbol(input + i, &symbol_length)
 			&& !in_special_zone((char *)input, i))
 		{
@@ -71,35 +70,33 @@ void	chained_split_prompt(t_token **list, char **tab)
 	}
 }
 
-char	**re_build_with_redir(char **tab_input)
+char	**re_build_with_redir(char **tab)
 {
 	char	**split_input;
 	char	**tmptab;
 	int		i;
 
-	i = 0;
-	while (tab_input[i])
+	i = -1;
+	while (tab[++i])
 	{
-		if (((tab_input[i][0] == '<' && (tab_input[i][1] == '\0'
-				|| tab_input[i][1] == '<')) || (tab_input[i][0] == '>'
-					&& (tab_input[i][1] == '\0' || tab_input[i][1] == '>')))
-			&& tab_input[i + 1])
+		if (((tab[i][0] == '<' && (tab[i][1] == '\0'
+				|| tab[i][1] == '<')) || (tab[i][0] == '>'
+			&& (tab[i][1] == '\0' || tab[i][1] == '>'))) && tab[i + 1])
 		{
-			split_input = ft_split(tab_input[i + 1], ' ');
+			split_input = ft_split(tab[i + 1], ' ');
 			if (len_tab(split_input) > 1)
 			{
 				tmptab = malloc(sizeof(char *) * 3);
-				tmptab[0] = ft_strdup(tab_input[i]);
+				tmptab[0] = ft_strdup(tab[i]);
 				tmptab[1] = ft_strdup(split_input[0]);
 				tmptab[2] = NULL;
-				tab_input[i + 1] = fuse_split_result(split_input, 1);
-				tab_input = fusionner_tableaux(tab_input, tmptab, i);
+				tab[i + 1] = fuse_split_result(split_input, 1);
+				tab = fusionner_tableaux(tab, tmptab, i);
 			}
 			free_tab(split_input);
 		}
-		i++;
 	}
-	return (tab_input);
+	return (tab);
 }
 
 void	lexer(char *input, t_mainstruct mainstruct)

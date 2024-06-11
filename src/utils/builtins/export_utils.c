@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 15:57:37 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 15:57:38 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 12:48:35 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,17 +34,13 @@ int	error_name(const char *name)
 	return (0);
 }
 
-int	update_existing_entry(char **current, const char *name, const char *value)
+int	update_existing_entry(char **current, char *name, char *value)
 {
 	if (ft_strncmp(*current, name, ft_strlen(name)) == 0)
 	{
 		free(*current);
-		*current = malloc(ft_strlen(name) + ft_strlen(value) + 2);
-		if (!(*current))
-			return (1);
-		ft_strcpy(*current, name);
-		ft_strcpy(*current + ft_strlen(name), "=");
-		ft_strcpy(*current + ft_strlen(name) + 1, value);
+		*current = ft_strjoin(name, ft_strdup("="));
+		*current = ft_strjoin(*current, value);
 		return (0);
 	}
 	return (-1);
@@ -79,25 +75,30 @@ char	**duplicate_env(char **env)
 	return (new_env);
 }
 
-char	**init_new_env(char ***env, int num_entries, const char *name,
-		const char *value)
+void	init_new_env(char ***env, int num_entries, char *name, char *value)
 {
 	char	**new_env;
+	int		i;
 
+	i = 0;
 	new_env = malloc((num_entries + 2) * sizeof(char *));
 	if (!new_env)
-		return (NULL);
-	new_env = duplicate_env(*env);
-	if (!new_env)
+		return ;
+	while (i < num_entries)
 	{
-		free(new_env);
-		return (NULL);
+		new_env[i] = ft_strdup((*env)[i]);
+		i++;
 	}
-	new_env[num_entries] = malloc(ft_strlen(name) + ft_strlen(value) + 2);
+	new_env[i] = ft_strjoin(name, ft_strdup("="));
+	new_env[i] = ft_strjoin(new_env[i], value);
+	new_env[i + 1] = NULL;
+	free_tab(*env);
+	*env = new_env;
+	if (!new_env)
+		return ;
 	if (!new_env[num_entries])
 	{
 		free(new_env);
-		return (NULL);
+		return ;
 	}
-	return (new_env);
 }

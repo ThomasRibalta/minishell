@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 15:58:00 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 15:58:01 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 17:30:43 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int	unset_var2(char ***env, const char *name)
 	return (0);
 }
 
-int	unset_var(char ***env, char **tab)
+int	unset_var(char ***env, char ***export, char **tab)
 {
 	int	i;
 	int	status;
@@ -50,6 +50,7 @@ int	unset_var(char ***env, char **tab)
 	while (tab[i])
 	{
 		unset_var2(env, tab[i]);
+		unset_var2(export, tab[i]);
 		i++;
 	}
 	return (status);

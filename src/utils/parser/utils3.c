@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:54:36 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 14:54:37 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 18:19:46 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,6 @@ char	*replacesubstring(char *str, int start, int end, char *replacement)
 
 	new_str = ft_strjoin(ft_substr(str, 0, start), replacement);
 	tmp = ft_strjoin(new_str, ft_strdup(str + end));
-	free(str);
-	free(new_str);
 	return (tmp);
 }
 
@@ -28,7 +26,7 @@ void	replace_variable(char **tmp, int *i, char **env, int *exit_status)
 {
 	char	*word;
 	char	*value;
-	char	*new_str;
+	char	*new;
 	int		j;
 
 	j = 1;
@@ -42,13 +40,13 @@ void	replace_variable(char **tmp, int *i, char **env, int *exit_status)
 		free(word);
 		if (value)
 			*tmp = replacesubstring(*tmp, *i, *i + j, value);
-		free(value);
 	}
 	else
 	{
-		new_str = ft_strjoin(ft_substr(*tmp, 0, *i), ft_strdup((*tmp) + *i + j));
+		new = ft_strjoin(ft_substr(*tmp, 0, *i), ft_strdup((*tmp) + *i + j));
 		free(*tmp);
-		*tmp = new_str;
+		free(word);
+		*tmp = new;
 		(*i)--;
 	}
 }
@@ -72,11 +70,16 @@ void	replaceenvvars(char **str, char **env, int *exit_status)
 
 void	edit_shlvl(char **env)
 {
+	char	*tmp;
+
 	while (*env)
 	{
 		if (ft_strncmp(*env, "SHLVL=", 6) == 0)
 		{
-			ft_strcpy(*env + 6, ft_itoa(ft_atoi(*env + 6) + 1));
+			tmp = ft_strjoin(ft_strdup("SHLVL="), ft_itoa(ft_atoi(*env + 6)
+						+ 1));
+			free(*env);
+			*env = tmp;
 			break ;
 		}
 		env++;

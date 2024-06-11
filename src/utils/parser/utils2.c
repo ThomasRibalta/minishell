@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 15:34:58 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 15:35:00 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 21:21:05 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,14 +72,19 @@ char	*get_env_value(char *word, char **env)
 char	*get_word_env(char *tmp, int i, int *j, char **env)
 {
 	char	*word;
+	char	*tmp2;
 
 	word = ft_substr(tmp + i + 1, 0, *j);
-	while ((in_env(ft_strjoin(ft_strdup(word), ft_strdup("=")), env) != 1 && tmp[i + *j]
-			&& tmp[i + *j] != ' ' && tmp[i + *j] != '$'))
+	tmp2 = ft_strjoin(ft_strdup(word), ft_strdup("="));
+	while ((in_env(tmp2, env) != 1 && tmp[i + *j] && tmp[i + *j] != ' ' && tmp[i
+				+ *j] != '$'))
 	{
 		free(word);
+		free(tmp2);
 		word = ft_substr(tmp + i + 1, 0, *j);
 		(*j)++;
+		tmp2 = ft_strjoin(ft_strdup(word), ft_strdup("="));
 	}
+	free(tmp2);
 	return (word);
 }

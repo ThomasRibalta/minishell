@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 15:41:14 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 15:41:33 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 16:24:53 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ void	parser(t_token *tokens, t_mainstruct mainstruct)
 {
 	t_startnode	*startnode;
 
+	(void)mainstruct;
 	startnode = createandsetupstartnode(tokens);
 	addlogicalnodetostartnode(startnode, tokens);
 	generateandattachbtree(startnode, tokens);

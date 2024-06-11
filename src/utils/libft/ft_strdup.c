@@ -6,11 +6,13 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 12:23:20 by jedurand          #+#    #+#             */
-/*   Updated: 2024/06/08 15:50:52 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 21:22:56 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+#include <stdlib.h>
+#include <string.h>
 
 char	*ft_strdup(const char *str)
 {
@@ -24,24 +26,18 @@ char	*ft_strdup(const char *str)
 	return ((char *)ft_memcpy(new, str, len));
 }
 
-char	*ft_strndup(const char *str, size_t n)
+char	*ft_strndup(const char *s1, size_t n)
 {
-	char	*new;
+	char	*copy;
 	size_t	len;
 
-	len = ft_strlen(str) + 1;
+	len = ft_strlen(s1);
 	if (n < len)
 		len = n;
-	new = (char *)malloc(sizeof(*new) * len);
-	if (!new)
+	copy = (char *)malloc(len + 1);
+	if (copy == NULL)
 		return (NULL);
-	return ((char *)ft_memcpy(new, str, len));
+	ft_strncpy(copy, s1, len);
+	copy[len] = '\0';
+	return (copy);
 }
-
-/*#include <stdio.h>
-int	main(void)
-{
-	char *res = ft_strdup("salut");
-	printf("%s", res);
-	return (0);
-}*/

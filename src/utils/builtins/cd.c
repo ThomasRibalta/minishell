@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 15:58:55 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 15:58:57 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 13:08:29 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,8 @@ static char	*get_target_path(char **tab, char **env)
 		if (tab[0][0] != '/')
 		{
 			pwd = get_cwd(0);
-			path = ft_strjoin(pwd, "/");
+			path = ft_strjoin(pwd, ft_strdup("/"));
 			path = ft_strjoin(path, ft_strdup(tab[0]));
-			free(pwd);
 		}
 		else
 			path = ft_strdup(tab[0]);
@@ -68,7 +67,7 @@ static int	handle_cd_errors(void)
 	return (0);
 }
 
-int	cd(char **tab, char ***env)
+int	cd(char **tab, char ***env, char ***export)
 {
 	char	*path;
 
@@ -85,8 +84,9 @@ int	cd(char **tab, char ***env)
 		free(path);
 		return (1);
 	}
-	export_var2(env, "OLDPWD", get_cwd(0));
-	export_var2(env, "PWD", path);
-	free(path);
+	export_var2(env, ft_strdup("OLDPWD"), get_cwd(0));
+	export_var2(env, ft_strdup("PWD"), ft_strdup(path));
+	export_var2(export, ft_strdup("OLDPWD"), get_cwd(0));
+	export_var2(export, ft_strdup("PWD"), path);
 	return (0);
 }

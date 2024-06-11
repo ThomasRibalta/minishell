@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:45:28 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 14:45:29 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 17:40:24 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,12 +84,14 @@ char	*here_doc(char *end)
 	while (i != 1)
 	{
 		write(1, "Here_doc >> ", 13);
-		tmp = get_next_line(0);
+		tmp = get_next_line(0, 0);
 		if (ft_strncmp(tmp, tmp2, ft_strlen(end)) == 0)
 			break ;
 		value = ft_strjoin(value, tmp);
-		free(tmp);
 	}
+	free(tmp);
+	tmp = get_next_line(0, 1);
+	free(tmp);
 	free(tmp2);
 	return (value);
 }

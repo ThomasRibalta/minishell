@@ -6,20 +6,33 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 16:03:40 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 16:04:16 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 21:32:24 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../header/minishell.h"
+
+char	*get_file_name(t_astnode *node)
+{
+	t_redirection	*tmp;
+
+	while (node->inputs->next)
+	{
+		tmp = node->inputs;
+		node->inputs = node->inputs->next;
+		free(tmp);
+	}
+	return (node->inputs->filename);
+}
 
 int	redirection_in(t_astnode *node, int *exit_status, t_command *cmd)
 {
 	char	*filename;
 	int		fd;
 
-	while (node->inputs->next)
-		node->inputs = node->inputs->next;
-	filename = node->inputs->filename;
+	if (node->inputs == NULL)
+		return (0);
+	filename = get_file_name(node);
 	if (node->inputs->caracteristic == 0)
 	{
 		fd = open(clean_quote(filename), O_RDONLY);
@@ -49,8 +62,7 @@ void	handle_child_process(t_astnode *node, t_command *cmd)
 		dup2(cmd->p_id2[0], STDIN_FILENO);
 		close(cmd->p_id2[0]);
 	}
-	if (!(node->is_last_command) || node->outputs != NULL
-		|| node->appends != NULL)
+	if (!(node->is_last_command) || node->outputs != NULL)
 	{
 		dup2(cmd->fd, STDOUT_FILENO);
 		close(cmd->fd);
@@ -90,8 +102,6 @@ int	open_output_append(t_astnode *node)
 {
 	int	fd;
 
-	while (node->outputs->next)
-		node->outputs = node->outputs->next;
 	if (node->outputs->caracteristic == 1)
 	{
 		fd = open(node->outputs->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);

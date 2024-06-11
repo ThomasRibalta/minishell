@@ -3,23 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   ft_substr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jedurand <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 15:03:42 by jedurand          #+#    #+#             */
-/*   Updated: 2023/10/03 11:20:28 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/06/11 18:08:44 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_substr(char const *s, unsigned int start, size_t len)
+char	*ft_substr(char const *s, int start, size_t len)
 {
 	char	*substr;
 	size_t	size;
 
 	if (!s)
 		return (NULL);
-	if (start >= (size_t)ft_strlen(s))
+	if ((size_t)start >= (size_t)ft_strlen(s))
 		return (ft_strdup(""));
 	size = ft_strlen(s + start);
 	if (size < len)

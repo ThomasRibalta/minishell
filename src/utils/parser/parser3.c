@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 15:26:23 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 15:29:19 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 16:28:55 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,6 @@ t_astnode	*createastnode(t_nodetype type, char *value)
 	node->right = NULL;
 	node->inputs = NULL;
 	node->outputs = NULL;
-	node->appends = NULL;
-	node->here_doc = NULL;
 	node->builtin = false;
 	node->is_last_command = false;
 	return (node);

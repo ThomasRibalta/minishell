@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 16:28:16 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 16:28:21 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 21:43:46 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,19 +22,20 @@ char	**get_current_file(void)
 
 	if (!init_current_dir(&n, &i, &tab, &dir))
 		return (NULL);
-	entry = readdir(dir);
-	while (entry != NULL)
+	while (1)
 	{
+		entry = readdir(dir);
+		if (entry == NULL)
+			break ;
 		if ((entry->d_name[0] == '.' && (entry->d_name[1] == '\0'
 					|| (entry->d_name[1] == '.' && entry->d_name[2] == '\0')))
 			|| entry->d_name[0] == '.')
 			continue ;
 		tab[i] = ft_strdup(entry->d_name);
 		i++;
-		entry = readdir(dir);
 	}
 	closedir(dir);
-	tab[n] = NULL;
+	tab[i] = NULL;
 	return (tab);
 }
 
@@ -48,20 +49,18 @@ char	**get_current_file_after(char *str)
 
 	if (!init_current_dir(&n, &i, &tab, &dir))
 		return (NULL);
-	entry = readdir(dir);
-	while (entry != NULL)
+	while (1)
 	{
+		entry = readdir(dir);
+		if (entry == NULL)
+			break ;
 		if ((entry->d_name[0] == '.' && (entry->d_name[1] == '\0'
 					|| (entry->d_name[1] == '.' && entry->d_name[2] == '\0')))
 			|| entry->d_name[0] == '.')
 			continue ;
 		if (strncmp(str, entry->d_name + ft_strlen(entry->d_name)
 				- ft_strlen(str), ft_strlen(str)) == 0)
-		{
-			tab[i] = ft_strdup(entry->d_name);
-			i++;
-		}
-		entry = readdir(dir);
+			tab[i++] = ft_strdup(entry->d_name);
 	}
 	closedir(dir);
 	tab[i] = NULL;
@@ -78,9 +77,11 @@ char	**get_current_file_after_before(char *str, char *str2)
 
 	if (!init_current_dir(&n, &i, &tab, &dir))
 		return (NULL);
-	entry = readdir(dir);
-	while (entry != NULL)
+	while (1)
 	{
+		entry = readdir(dir);
+		if (entry == NULL)
+			break ;
 		if ((entry->d_name[0] == '.' && (entry->d_name[1] == '\0'
 					|| (entry->d_name[1] == '.' && entry->d_name[2] == '\0')))
 			|| entry->d_name[0] == '.')
@@ -88,11 +89,7 @@ char	**get_current_file_after_before(char *str, char *str2)
 		if (ft_strncmp(str2, entry->d_name, ft_strlen(str2)) == 0
 			&& ft_strncmp(str, entry->d_name + ft_strlen(entry->d_name)
 				- ft_strlen(str), ft_strlen(str)) == 0)
-		{
-			tab[i] = ft_strdup(entry->d_name);
-			i++;
-		}
-		entry = readdir(dir);
+			tab[i++] = ft_strdup(entry->d_name);
 	}
 	closedir(dir);
 	tab[i] = NULL;

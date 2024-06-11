@@ -6,27 +6,31 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:43:47 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 14:43:49 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 17:21:00 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../header/minishell.h"
 
-t_token	*createtoken(t_tokentype type, const char *value)
+t_token	*createtoken(t_tokentype type, char *value)
 {
 	t_token	*tokens;
 
 	tokens = (t_token *)malloc(sizeof(t_token));
 	tokens->type = type;
 	if (value != NULL)
-		tokens->value = strdup(value);
+	{
+		tokens->value = ft_strdup(value);
+		if (type == TOKEN_HEREDOC)
+			free(value);
+	}
 	else
 		tokens->value = NULL;
 	tokens->next = NULL;
 	return (tokens);
 }
 
-void	appendtoken(t_token **head, t_tokentype type, const char *value)
+void	appendtoken(t_token **head, t_tokentype type, char *value)
 {
 	t_token	*newtoken;
 	t_token	*current;
@@ -56,7 +60,9 @@ void	freetokens(t_token *head)
 		tmp = head;
 		head = head->next;
 		if (tmp->value != NULL)
+		{
 			free(tmp->value);
+		}
 		free(tmp);
 	}
 }

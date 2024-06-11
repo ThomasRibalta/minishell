@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 16:09:13 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 16:09:14 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 21:14:11 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ void	free_command(t_command *cmd)
 		waitpid(cmd->pids[j], &tmp, 0);
 		j++;
 	}
-	*cmd->mainstruct.exit_status = MY_WEXITSTATUS(tmp);
+	*cmd->mainstruct.exit_status = my_wexitstatus(tmp);
 	free(cmd->pids);
 	free(cmd);
 }

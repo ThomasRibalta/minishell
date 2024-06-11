@@ -39,6 +39,7 @@ char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 	return (c + 1 + index - index);
 }
 #include <stdio.h>
+
 int	main (void)
 {
 	printf("%s", ft_strmapi("salut", &ft_upone));

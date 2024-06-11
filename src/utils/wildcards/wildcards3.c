@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 16:25:14 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 16:25:15 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/10 18:33:15 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,15 @@ int	count_files_with_prefix(DIR *dir, const char *prefix)
 
 	n = 0;
 	prefix_len = ft_strlen(prefix);
-	entry = readdir(dir);
-	while (entry != NULL)
+	while (1)
 	{
+		entry = readdir(dir);
+		if (entry == NULL)
+			break ;
 		if (is_special_dir(entry->d_name))
 			continue ;
 		if (ft_strncmp(prefix, entry->d_name, prefix_len) == 0)
 			n++;
-		entry = readdir(dir);
 	}
 	return (n);
 }
@@ -44,9 +45,11 @@ int	count_files_with_prefix_and_suffix(DIR *dir, const char *prefix,
 	n = 0;
 	prefix_len = ft_strlen(prefix);
 	suffix_len = ft_strlen(suffix);
-	entry = readdir(dir);
-	while (entry != NULL)
+	while (1)
 	{
+		entry = readdir(dir);
+		if (entry == NULL)
+			break ;
 		if (is_special_dir(entry->d_name))
 			continue ;
 		name_len = ft_strlen(entry->d_name);
@@ -54,7 +57,6 @@ int	count_files_with_prefix_and_suffix(DIR *dir, const char *prefix,
 				entry->d_name, prefix_len) == 0 && ft_strncmp(suffix,
 				entry->d_name + name_len - suffix_len, suffix_len) == 0)
 			n++;
-		entry = readdir(dir);
 	}
 	return (n);
 }

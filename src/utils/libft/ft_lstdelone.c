@@ -14,7 +14,7 @@
 
 void	ft_lstdelone(t_list *lst, void (*del)(void *))
 {
-	(*del)(lst -> content);
+	(*del)(lst->content);
 	free(lst);
 }
 
@@ -24,6 +24,7 @@ void	ft_lstdelone(t_list *lst, void (*del)(void *))
 }
 
 #include <stdio.h>
+
 int	main(void)
 {
 	char *cont = ft_strdup("salut");

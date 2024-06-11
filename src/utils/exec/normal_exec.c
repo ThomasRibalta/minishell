@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 16:15:53 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 16:16:30 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 21:06:16 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,10 @@ void	execute_command2(t_astnode *node, t_command *cmd,
 	{
 		handle_child_process(node, cmd);
 		if (is_fork_builtin(clean_quote(split_nodevalue[0])))
-			execute_fork_builtin(*(cmd->mainstruct.env), *(cmd->mainstruct.export), split_nodevalue);
-		execute(split_nodevalue, get_path(*(cmd->mainstruct.env)), *(cmd->mainstruct.env));
+			execute_fork_builtin(*(cmd->mainstruct.env),
+				*(cmd->mainstruct.export), split_nodevalue);
+		execute(split_nodevalue, get_path(*(cmd->mainstruct.env)),
+			*(cmd->mainstruct.env));
 	}
 	else
 	{
@@ -82,8 +84,16 @@ void	execute_command(t_astnode *node, t_command *cmd)
 
 void	execute_output_append_command(t_astnode *node, t_command *cmd)
 {
+	t_redirection	*tmp;
+
 	if (node->outputs)
 	{
+		while (node->outputs->next)
+		{
+			tmp = node->outputs;
+			node->outputs = node->outputs->next;
+			free(tmp);
+		}
 		cmd->fd = open_output_append(node);
 		if (cmd->fd == -1)
 		{

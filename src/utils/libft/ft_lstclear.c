@@ -20,8 +20,8 @@ void	ft_lstclear(t_list **lst, void (*del)(void *))
 	head = *lst;
 	while (head)
 	{
-		tmp = head -> next;
-		(*del)(head -> content);
+		tmp = head->next;
+		(*del)(head->content);
 		free(head);
 		head = tmp;
 	}
@@ -34,6 +34,7 @@ void	ft_lstclear(t_list **lst, void (*del)(void *))
 }
 
 #include <stdio.h>
+
 int	main(void)
 {
 	t_list *l = ft_lstnew(ft_strdup("salut"));

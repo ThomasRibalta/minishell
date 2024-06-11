@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: thoribal <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/19 12:52:24 by thoribal          #+#    #+#             */
-/*   Updated: 2023/11/12 10:33:57 by thoribal         ###   ########.fr       */
+/*   Updated: 2024/06/11 17:41:48 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,13 +76,18 @@ char	*save_next(char *s)
 	return (str);
 }
 
-char	*get_next_line(int fd)
+char	*get_next_line(int fd, int i)
 {
 	char		*line;
 	static char	*s;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
+	if (i == 1)
+	{
+		free(s);
+		return (NULL);
+	}
 	s = get_next_end(fd, s);
 	if (!s)
 		return (NULL);
@@ -90,23 +95,3 @@ char	*get_next_line(int fd)
 	s = save_next(s);
 	return (line);
 }
-/*
-int	main(void)
-{
-	int	fd;
-	char	*line;
-
-	fd = open("big_line_no_nl", O_RDONLY);
-	line = get_next_line(fd);
-	printf("%s", line);
-	free(line);
-	line = get_next_line(fd);
-	printf("%s", line);
-	free(line);
-	line = get_next_line(fd);
-	printf("%s", line);
-	free(line);
-	line = get_next_line(fd);
-	printf("%s", line);
-	free(line);
-}*/

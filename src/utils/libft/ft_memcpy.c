@@ -32,7 +32,7 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 check why && and not ||*/
 
 /*#include <stdio.h>
-int main(void)
+int	main(void)
 {
 	char src[6] = "salut";
 	char dest[100];

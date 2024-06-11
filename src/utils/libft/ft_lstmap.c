@@ -30,7 +30,7 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
 			return (NULL);
 		}
 		ft_lstadd_back(&head, tmp);
-		lst = lst -> next;
+		lst = lst->next;
 	}
 	return (head);
 }
@@ -42,10 +42,13 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
 
 static void	*up(void *s)
 {
+	char	*str;
+	int		i;
+
 	if (!s)
 		return (NULL);
-	char *str = ft_strdup(s);
-	int i = -1;
+	str = ft_strdup(s);
+	i = -1;
 	while (str[++i])
 	{
 		str[i] = ft_toupper(str[i]);
@@ -62,6 +65,7 @@ static void	pstr(void *str)
 }
 
 #include <stdio.h>
+
 int	main(void)
 {
 	t_list *l = ft_lstnew(ft_strdup("salut"));

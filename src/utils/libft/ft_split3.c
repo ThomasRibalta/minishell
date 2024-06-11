@@ -1,33 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   echo.c                                             :+:      :+:    :+:   */
+/*   ft_split3.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/08 15:58:18 by toto              #+#    #+#             */
-/*   Updated: 2024/06/11 17:19:59 by toto             ###   ########.fr       */
+/*   Created: 2024/06/11 21:26:15 by toto              #+#    #+#             */
+/*   Updated: 2024/06/11 21:27:39 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../header/minishell.h"
+#include "libft.h"
 
-void	echo(char **tab)
+int	skip_separators(const char **s, char sep)
+{
+	int	j;
+
+	j = 0;
+	while ((*s)[j] == sep)
+		j++;
+	return (j);
+}
+
+int	find_substr_length(const char *s, char sep)
 {
 	int	i;
 
-	i = 1;
-	if (tab[1] == NULL || tab[1][0] == '\0')
-		ft_putchar_fd('\n', 1);
-	while (tab[i] && ft_strcmp(tab[i], "-n") == 0)
+	i = 0;
+	while (s[i] && (s[i] != sep || in_special_zone((char *)s, i)))
 		i++;
-	while (tab[i] != NULL)
-	{
-		ft_putstr_fd(tab[i], 1);
-		if (i + 1 < len_tab(tab))
-			ft_putchar_fd(' ', 1);
-		i++;
-	}
-	if (tab[1] && ft_strncmp(tab[1], "-n", 2) != 0)
-		ft_putchar_fd('\n', 1);
+	return (i);
 }

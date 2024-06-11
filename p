@@ -15,13 +15,11 @@ SRC_1 = src/utils/parser/expenser.c \
 				src/utils/wildcards/wildcards3.c \
 				src/utils/wildcards/wildcards4.c \
 				src/utils/init_terminal.c \
-				src/utils/init_terminal2.c \
 				src/utils/exec/executer.c \
 				src/utils/exec/normal_exec.c \
 				src/utils/exec/parenthese_exec.c \
 				src/utils/exec/redirection.c \
 				src/utils/exec/utils.c \
-				src/utils/exec/free_parser.c \
 				src/utils/exec/execv.c \
 				src/utils/lexer/lexer.c \
 				src/utils/lexer/token_manager.c \

@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 15:22:02 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 15:22:03 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 21:20:40 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,27 @@ void	init_parsertmp(t_parsertmp *parsertmp)
 	parsertmp->tempoutputs = NULL;
 }
 
+void	handle_token(t_token **ct, t_parsertmp *parsertmp)
+{
+	if ((*ct)->type == TOKEN_COMMAND || (*ct)->type == TOKEN_PAREN)
+	{
+		type_command_or_parent(ct, &parsertmp->currentcommand, &parsertmp->root,
+			&parsertmp->last);
+	}
+	else if ((*ct)->type == TOKEN_PIPE || (*ct)->type == TOKEN_LOGICAL_AND
+		|| (*ct)->type == TOKEN_LOGICAL_OR)
+	{
+		handlepipeorlogicaloperator(ct, parsertmp);
+		if ((*ct)->type != TOKEN_PIPE)
+			return ;
+	}
+	else if ((*ct)->type == TOKEN_IN || (*ct)->type == TOKEN_OUT
+		|| (*ct)->type == TOKEN_APPEND || (*ct)->type == TOKEN_HEREDOC)
+	{
+		parser_redirection(&parsertmp->tempinputs, &parsertmp->tempoutputs, ct);
+	}
+}
+
 t_astnode	*buildcommand(t_token **ct)
 {
 	t_parsertmp	parsertmp;
@@ -48,20 +69,10 @@ t_astnode	*buildcommand(t_token **ct)
 	init_parsertmp(&parsertmp);
 	while (*ct)
 	{
-		if ((*ct)->type == TOKEN_COMMAND || (*ct)->type == TOKEN_PAREN)
-			type_command_or_parent(ct, &parsertmp.currentcommand,
-				&parsertmp.root, &parsertmp.last);
-		else if ((*ct)->type == TOKEN_PIPE || (*ct)->type == TOKEN_LOGICAL_AND
-			|| (*ct)->type == TOKEN_LOGICAL_OR)
-		{
-			handlepipeorlogicaloperator(ct, &parsertmp);
-			if ((*ct)->type != TOKEN_PIPE)
-				return (parsertmp.root);
-		}
-		else if ((*ct)->type == TOKEN_IN || (*ct)->type == TOKEN_OUT
-			|| (*ct)->type == TOKEN_APPEND || (*ct)->type == TOKEN_HEREDOC)
-			parser_redirection(&parsertmp.tempinputs, &parsertmp.tempoutputs,
-				ct);
+		handle_token(ct, &parsertmp);
+		if ((*ct) && ((*ct)->type == TOKEN_LOGICAL_AND
+				|| (*ct)->type == TOKEN_LOGICAL_OR))
+			break ;
 		*ct = (*ct)->next;
 	}
 	if (parsertmp.currentcommand == NULL && (parsertmp.tempinputs

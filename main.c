@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:10:30 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 14:13:02 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/10 19:07:48 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,9 @@ int	main(int ac, char **av, char **env)
 	if (ac > 2 && !*av)
 		return (0);
 	init_signal();
-	init_terminal(env);
 	env2 = clone_env(env);
-	export = clone_env(env);
+	init_terminal(env2);
+	export = clone_env(env2);
 	g_global_sig = 0;
 	i = 0;
 	start_terminal(env2, export, i);

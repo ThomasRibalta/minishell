@@ -16,8 +16,8 @@ void	ft_lstiter(t_list *lst, void (*f)(void *))
 {
 	while (lst)
 	{
-		(*f)(lst -> content);
-		lst = lst -> next;
+		(*f)(lst->content);
+		lst = lst->next;
 	}
 }
 /*static void	pstr(void *str)
@@ -28,6 +28,7 @@ void	ft_lstiter(t_list *lst, void (*f)(void *))
 }
 
 #include <stdio.h>
+
 int	main(void)
 {
 	t_list *l = ft_lstnew(ft_strdup("salut"));

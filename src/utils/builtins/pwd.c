@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 15:56:14 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 15:56:14 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 21:30:49 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@ char	*get_cwd(int i)
 	tmp = cwd;
 	if (i == 1 && ft_strlen(cwd) >= ft_strlen(getenv("HOME")))
 	{
-		tmp = ft_strjoin(ft_strdup("~"), ft_strdup(cwd + ft_strlen(getenv("HOME"))));
+		tmp = ft_strjoin(ft_strdup("~"), ft_strdup(cwd
+					+ ft_strlen(getenv("HOME"))));
 		free(cwd);
 	}
 	return (tmp);

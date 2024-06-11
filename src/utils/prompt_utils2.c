@@ -6,7 +6,7 @@
 /*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:16:37 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 14:16:38 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/11 18:08:20 by toto             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,57 +40,53 @@ char	*clean_white_space(char *input)
 	return (clean_input);
 }
 
+char	*split_clean_quote(char *input, int *i, char quote)
+{
+	int		tmp;
+	char	*tmp_input;
+
+	tmp = *i + 1 + ft_strnchr(input + *i + 1, quote);
+	tmp_input = ft_strjoin(ft_strjoin(ft_substr(input, 0, *i), ft_substr(input,
+					*i + 1, ft_strnchr(input + *i + 1, quote))), ft_substr(input
+				+ 1, ft_strnchr(input + *i + 1, quote) + *i + 1,
+				ft_strlen(input)));
+	free(input);
+	input = tmp_input;
+	*i = tmp - 2;
+	return (input);
+}
+
 char	*clean_quote(char *input)
 {
 	int	i;
-	int	tmp;
-	char *tmp_input;
 
 	i = 0;
-	tmp = 0;
 	while (input[i])
 	{
 		if (input[i] == '"' && ft_strnchr(input + i + 1, '"') != -1)
-		{
-			tmp = i + 1 + ft_strnchr(input + i + 1, '"');
-			tmp_input = ft_strjoin(ft_strjoin(ft_substr(input, 0, i),
-						ft_substr(input, i + 1, ft_strnchr(input + i + 1,
-								'"'))), ft_substr(input + 1, ft_strnchr(input
-							+ i + 1, '"') + i + 1, ft_strlen(input)));
-			free(input);
-			input = tmp_input;
-			i = tmp - 2;
-		}
+			input = split_clean_quote(input, &i, '"');
 		else if (input[i] == 39 && ft_strnchr(input + i + 1, 39) != -1)
-		{
-			tmp = i + 1 + ft_strnchr(input + i + 1, 39);
-			tmp_input = ft_strjoin(ft_strjoin(ft_substr(input, 0, i),
-						ft_substr(input, i + 1, ft_strnchr(input + i + 1, 39))),
-					ft_substr(input + 1, ft_strnchr(input + i + 1, 39) + i + 1,
-						ft_strlen(input)));
-			free(input);
-			input = tmp_input;
-			i = tmp - 2;
-		}
+			input = split_clean_quote(input, &i, 39);
 		i++;
 	}
 	return (input);
 }
 
-char	*clean_prompt(char *input, t_mainstruct mainstruct)
+void	clean_prompt(char *input, t_mainstruct mainstruct)
 {
 	char	*prompt;
 
 	prompt = clean_white_space(input);
 	lexer(prompt, mainstruct);
-	return (prompt);
+	free(prompt);
 }
 
 void	check_prompt(char *input, t_mainstruct mainstruct)
 {
-	char	*prompt;
-
-	prompt = clean_prompt(input, mainstruct);
-	if (prompt)
-		free(prompt);
+	if (input[0] == '\0')
+	{
+		free(input);
+		return ;
+	}
+	clean_prompt(input, mainstruct);
 }
