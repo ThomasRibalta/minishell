@@ -55,28 +55,29 @@ void	exit_program(char **value, t_command *cmd)
 	return ;
 }
 
-void clean_exit()
+void	clean_exit(void)
 {
-    int pipefd[2];
-		char *tmp;
+	char	*tmp;
+	int		pipefd[2];
+	int		saved_stdin;
 
-    if (pipe(pipefd) == -1)
-        exit(EXIT_FAILURE);
-    int saved_stdin = dup(STDIN_FILENO);
-    if (saved_stdin == -1)
-        exit(EXIT_FAILURE);
+	if (pipe(pipefd) == -1)
+		exit(EXIT_FAILURE);
+	saved_stdin = dup(STDIN_FILENO);
+	if (saved_stdin == -1)
+		exit(EXIT_FAILURE);
+	tmp = get_next_line(saved_stdin, 0);
+	while (tmp)
+	{
+		free(tmp);
 		tmp = get_next_line(saved_stdin, 0);
-		while (tmp)
-		{
-			free(tmp);
-			tmp = get_next_line(saved_stdin, 0);
-		}
-		free(tmp);
-		tmp = get_next_line(saved_stdin, 1);
-		free(tmp);
-    write(pipefd[1], "", 1);
-    close(pipefd[0]);
-    close(pipefd[1]);
-    dup2(saved_stdin, STDIN_FILENO);
-    close(saved_stdin);
+	}
+	free(tmp);
+	tmp = get_next_line(saved_stdin, 1);
+	free(tmp);
+	write(pipefd[1], "", 1);
+	close(pipefd[0]);
+	close(pipefd[1]);
+	dup2(saved_stdin, STDIN_FILENO);
+	close(saved_stdin);
 }

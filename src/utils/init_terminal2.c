@@ -46,6 +46,6 @@ void	stop_process(t_mainstruct mainstruct, char *make_readline)
 	free(make_readline);
 	free_tab(*mainstruct.env);
 	free_tab(*mainstruct.export);
-	clear_history();
+	rl_clear_history();
 	exit(0);
 }

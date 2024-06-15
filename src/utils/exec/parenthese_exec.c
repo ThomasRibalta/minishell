@@ -16,7 +16,7 @@ int	execute_builtin(t_command *cmd, char **param, t_astnode *node)
 {
 	if (ft_strcmp(clean_quote(param[0]), "exit") == 0 && node->is_last_command)
 		exit_program(param + 1, cmd);
-	else if (ft_strcmp(clean_quote(param[0]), "exit")== 0)
+	else if (ft_strcmp(clean_quote(param[0]), "exit") == 0)
 		clean_exit();
 	else if ((ft_strcmp(clean_quote(param[0]), "cd") == 0
 			|| ft_strcmp(clean_quote(param[0]), "cd") == 0)

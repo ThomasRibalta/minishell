@@ -12,7 +12,7 @@
 
 #include "../../header/minishell.h"
 
-void print_sorted_env(char **env)
+void	print_sorted_env(char **env)
 {
 	int		i;
 	int		j;
@@ -31,7 +31,7 @@ void print_sorted_env(char **env)
 				env[j] = tmp;
 			}
 			j++;
-		};
+		}
 	}
 	i = 0;
 	while (env[i] != NULL)

@@ -139,7 +139,7 @@ int						len_tab(char **tab);
 void					start_terminal(char **env, char **export,
 							int exit_status);
 void					init_terminal(char **env);
-void					clean_exit();
+void					clean_exit(void);
 char					**clone_env(char **env);
 void					write_terminal_title(void);
 char					**get_current_file(void);
