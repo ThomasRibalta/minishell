@@ -27,19 +27,19 @@ void	handle_logical_node(t_startnode *startnode, int i,
 	if (startnode->children[i]->type == NODE_LOGICAL_AND)
 	{
 		if (startnode->children[i]->left && (*mainstruct.exit_status == 0
-				|| i == 0))
+				|| i == 0) && *mainstruct.exit == -1)
 			execute_logical_and_or(startnode->children[i]->left, mainstruct);
 		if (i == 0 && startnode->children[i]->right
-			&& *mainstruct.exit_status == 0)
+			&& *mainstruct.exit_status == 0 && *mainstruct.exit == -1)
 			execute_logical_and_or(startnode->children[i]->right, mainstruct);
 	}
 	else if (startnode->children[i]->type == NODE_LOGICAL_OR)
 	{
 		if (startnode->children[i]->left && (*mainstruct.exit_status != 0
-				|| i == 0))
+				|| i == 0) && *mainstruct.exit == -1)
 			execute_logical_and_or(startnode->children[i]->left, mainstruct);
 		if (i == 0 && startnode->children[i]->right
-			&& *mainstruct.exit_status != 0)
+			&& *mainstruct.exit_status != 0 && *mainstruct.exit == -1)
 			execute_logical_and_or(startnode->children[i]->right, mainstruct);
 	}
 }

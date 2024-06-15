@@ -25,6 +25,7 @@
 # include <string.h>
 # include <sys/wait.h>
 # include <unistd.h>
+# include <fcntl.h>
 # define VIOLET_FONCE "\e[35;2m"
 # define VIOLET "\e[35m"
 # define VERT "\e[32m"
@@ -138,6 +139,7 @@ int						len_tab(char **tab);
 void					start_terminal(char **env, char **export,
 							int exit_status);
 void					init_terminal(char **env);
+void					clean_exit();
 char					**clone_env(char **env);
 void					write_terminal_title(void);
 char					**get_current_file(void);

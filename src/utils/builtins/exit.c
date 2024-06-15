@@ -54,3 +54,29 @@ void	exit_program(char **value, t_command *cmd)
 	*cmd->mainstruct.exit = i;
 	return ;
 }
+
+void clean_exit()
+{
+    int pipefd[2];
+		char *tmp;
+
+    if (pipe(pipefd) == -1)
+        exit(EXIT_FAILURE);
+    int saved_stdin = dup(STDIN_FILENO);
+    if (saved_stdin == -1)
+        exit(EXIT_FAILURE);
+		tmp = get_next_line(saved_stdin, 0);
+		while (tmp)
+		{
+			free(tmp);
+			tmp = get_next_line(saved_stdin, 0);
+		}
+		free(tmp);
+		tmp = get_next_line(saved_stdin, 1);
+		free(tmp);
+    write(pipefd[1], "", 1);
+    close(pipefd[0]);
+    close(pipefd[1]);
+    dup2(saved_stdin, STDIN_FILENO);
+    close(saved_stdin);
+}

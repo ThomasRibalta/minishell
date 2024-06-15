@@ -16,6 +16,8 @@ int	execute_builtin(t_command *cmd, char **param, t_astnode *node)
 {
 	if (ft_strcmp(clean_quote(param[0]), "exit") == 0 && node->is_last_command)
 		exit_program(param + 1, cmd);
+	else if (ft_strcmp(clean_quote(param[0]), "exit")== 0)
+		clean_exit();
 	else if ((ft_strcmp(clean_quote(param[0]), "cd") == 0
 			|| ft_strcmp(clean_quote(param[0]), "cd") == 0)
 		&& node->is_last_command)
@@ -55,7 +57,6 @@ int	execute_fork_builtin(char **env, char **export, char **par)
 		|| ft_strcmp(clean_quote(par[0]), "/bin/pwd") == 0)
 	{
 		pwd2 = pwd(0);
-		printf("%s\n", pwd2);
 		free(pwd2);
 	}
 	else

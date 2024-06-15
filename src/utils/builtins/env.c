@@ -12,16 +12,48 @@
 
 #include "../../header/minishell.h"
 
+void print_sorted_env(char **env)
+{
+	int		i;
+	int		j;
+	char	*tmp;
+
+	i = -1;
+	while (env[++i] != NULL)
+	{
+		j = i + 1;
+		while (env[j] != NULL)
+		{
+			if (ft_strcmp(env[i], env[j]) > 0)
+			{
+				tmp = env[i];
+				env[i] = env[j];
+				env[j] = tmp;
+			}
+			j++;
+		};
+	}
+	i = 0;
+	while (env[i] != NULL)
+	{
+		printf("declare -x %s\n", env[i]);
+		i++;
+	}
+}
+
 void	print_env(char **env, int nb)
 {
 	int	i;
 
 	i = 0;
-	while (env[i] != NULL)
+	if (nb == 1)
+		print_sorted_env(env);
+	else
 	{
-		if (nb == 1)
-			printf("declare -x ");
-		printf("%s\n", env[i]);
-		i++;
+		while (env[i] != NULL)
+		{
+			printf("%s\n", env[i]);
+			i++;
+		}
 	}
 }

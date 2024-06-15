@@ -17,7 +17,7 @@ void	processbinarytree2(t_astnode *node, t_command *cmd)
 	if (node == NULL)
 		return ;
 	processbinarytree2(node->left, cmd);
-	if (node->type == NODE_COMMAND)
+	if (node->type == NODE_COMMAND && *cmd->mainstruct.exit == -1)
 	{
 		if (node->outputs)
 			execute_output_append_command(node, cmd);
@@ -27,7 +27,7 @@ void	processbinarytree2(t_astnode *node, t_command *cmd)
 			execute_command(node, cmd);
 		}
 	}
-	if (node->type == NODE_PARENTHESE)
+	if (node->type == NODE_PARENTHESE && *cmd->mainstruct.exit == -1)
 	{
 		execute_output_append_parenthese(node, cmd);
 	}
