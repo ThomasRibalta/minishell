@@ -27,11 +27,9 @@ char	*get_cwd(int i)
 	{
 		tmp = ft_strjoin(ft_strdup("~"), ft_strdup(cwd
 					+ ft_strlen(getenv("HOME"))));
-		free(cwd);
 	}
 	if (tmp == NULL || tmp[0] == '\0')
 	{
-		free(cwd);
 		return (NULL);
 	}
 	return (tmp);

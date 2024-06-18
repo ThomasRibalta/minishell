@@ -60,10 +60,8 @@ static int	handle_cd_errors(void)
 		ft_putstr_fd("cd: error retrieving current directory: ", 2);
 		ft_putstr_fd("getcwd: cannot access parent directories: ", 2);
 		ft_putstr_fd("No such file or directory\n", 2);
-		free(pwd);
 		return (1);
 	}
-	free(pwd);
 	return (0);
 }
 
@@ -76,12 +74,10 @@ int	cd(char **tab, char ***env, char ***export)
 		return (1);
 	if (handle_cd_errors())
 	{
-		free(path);
 		return (1);
 	}
 	if (change_directory(path))
 	{
-		free(path);
 		return (1);
 	}
 	export_var2(env, ft_strdup("OLDPWD"), get_cwd(0));

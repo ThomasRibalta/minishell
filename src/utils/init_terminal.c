@@ -81,6 +81,6 @@ void	start_terminal(char **env, char **export, int exit_status)
 	}
 	free_tab(*mainstruct.env);
 	free_tab(*mainstruct.export);
-	rl_clear_history();
+	clear_history();
 	exit(*mainstruct.exit);
 }
