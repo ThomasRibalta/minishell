@@ -72,6 +72,21 @@ char	*clean_quote(char *input)
 	return (input);
 }
 
+int is_only_spaces_and_tabs(const char *str) {
+    if (str == NULL) {
+        return 0; // Retourne 0 si le pointeur est NULL
+    }
+
+    while (*str != '\0') {
+        if (*str != ' ' && *str != '\t') {
+            return 0;
+        }
+        str++;
+    }
+    return 1;
+}
+
+
 void	clean_prompt(char *input, t_mainstruct mainstruct)
 {
 	char	*prompt;
@@ -83,7 +98,7 @@ void	clean_prompt(char *input, t_mainstruct mainstruct)
 
 void	check_prompt(char *input, t_mainstruct mainstruct)
 {
-	if (input[0] == '\0')
+	if (input[0] == '\0' || is_only_spaces_and_tabs(input))
 	{
 		free(input);
 		return ;

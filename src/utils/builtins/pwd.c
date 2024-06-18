@@ -29,6 +29,11 @@ char	*get_cwd(int i)
 					+ ft_strlen(getenv("HOME"))));
 		free(cwd);
 	}
+	if (tmp == NULL || tmp[0] == '\0')
+	{
+		free(cwd);
+		return (NULL);
+	}
 	return (tmp);
 }
 
@@ -39,9 +44,9 @@ char	*pwd(int i)
 	cwd = get_cwd(i);
 	if (cwd[0] == '\0')
 	{
-		return ("pwd: error retrieving current directory:"
+		return (ft_strdup("pwd: error retrieving current directory:"
 			" getcwd: cannot access parent directories:"
-			" No such file or directory\n");
+			" No such file or directory\n"));
 	}
 	else
 		return (cwd);

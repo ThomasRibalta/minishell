@@ -12,6 +12,19 @@
 
 #include "../../header/minishell.h"
 
+int	is_only_n(const char *str)
+{
+	if (str == NULL || str[0] == '\0')
+		return (0);
+	while (*str != '\0')
+	{
+		if (*str != 'n')
+			return (0);
+		str++;
+	}
+	return 1;
+}
+
 void	echo(char **tab)
 {
 	int	i;
@@ -19,7 +32,7 @@ void	echo(char **tab)
 	i = 1;
 	if (tab[1] == NULL || tab[1][0] == '\0')
 		ft_putchar_fd('\n', 1);
-	while (tab[i] && ft_strcmp(tab[i], "-n") == 0)
+	while (tab[i] && tab[i][0] == '-' && is_only_n(tab[i] + 1) == 1)
 		i++;
 	while (tab[i] != NULL)
 	{

@@ -35,7 +35,9 @@ char	**execute_commande_split(t_astnode *node, int *exit_status,
 	if (is_builtin(clean_quote(split_nodevalue[0])))
 	{
 		if (!execute_builtin(cmd, split_nodevalue, node))
+		{
 			return (NULL);
+		}
 	}
 	return (split_nodevalue);
 }
@@ -64,10 +66,12 @@ void	execute_command2(t_astnode *node, t_command *cmd,
 void	execute_command(t_astnode *node, t_command *cmd)
 {
 	char	**split_nodevalue;
+	char	*value;
 	pid_t	pid;
 
 	if (node == NULL || node->value == NULL)
 		return ;
+	value = node->value;
 	if (pipe(cmd->p_id) == -1)
 		return ((void)perror("pipe"), (void)exit(EXIT_FAILURE));
 	if (cmd->fd == -1)
@@ -80,6 +84,8 @@ void	execute_command(t_astnode *node, t_command *cmd)
 	if (pid == -1)
 		return ((void)perror("fork"), (void)exit(EXIT_FAILURE));
 	execute_command2(node, cmd, split_nodevalue, pid);
+	if (ft_strcmp(value, node->value) != 0)
+		free(node->value);
 }
 
 void	execute_output_append_command(t_astnode *node, t_command *cmd)

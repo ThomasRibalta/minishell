@@ -48,11 +48,6 @@ int	execute_fork_builtin(char **env, char **export, char **par)
 		print_env(env, 0);
 	else if (ft_strcmp(clean_quote(par[0]), "export") == 0 && par[1] == NULL)
 		print_env(export, 1);
-	else if (ft_strcmp(clean_quote(par[0]), "cd") == 0
-		|| ft_strcmp(clean_quote(par[0]), "cd") == 0)
-		exit(0);
-	else if (ft_strcmp(clean_quote(par[0]), "unset") == 0)
-		exit(0);
 	else if (ft_strcmp(clean_quote(par[0]), "pwd") == 0
 		|| ft_strcmp(clean_quote(par[0]), "/bin/pwd") == 0)
 	{
@@ -61,6 +56,7 @@ int	execute_fork_builtin(char **env, char **export, char **par)
 	}
 	else
 		return (1);
+	free_tab(par);
 	exit(0);
 }
 
