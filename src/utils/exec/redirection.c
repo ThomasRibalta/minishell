@@ -15,14 +15,14 @@
 char	*get_file_name(t_astnode *node)
 {
 	t_redirection	*tmp;
-
-	while (node->inputs->next)
+	
+	printf("inputs : %s\n", node->inputs->filename);
+	tmp = node->inputs;
+	while (tmp->next)
 	{
-		tmp = node->inputs;
-		node->inputs = node->inputs->next;
-		free(tmp);
+		tmp = tmp->next;
 	}
-	return (node->inputs->filename);
+	return (tmp->filename);
 }
 
 int	redirection_in(t_astnode *node, int *exit_status, t_command *cmd)
@@ -65,12 +65,16 @@ void	handle_child_process(t_astnode *node, t_command *cmd)
 	if (!(node->is_last_command) || node->outputs != NULL)
 	{
 		dup2(cmd->fd, STDOUT_FILENO);
+		if (!cmd->here_doc)
+			close(cmd->p_id[0]);
 		close(cmd->fd);
 	}
 	else
 	{
 		dup2(cmd->std_out, STDOUT_FILENO);
 		close(cmd->std_out);
+		close(cmd->fd);
+		close(cmd->p_id[0]);
 	}
 }
 
@@ -90,11 +94,15 @@ void	handle_parent_process(t_astnode *node, t_command *cmd)
 		dup2(cmd->p_id[0], STDIN_FILENO);
 		close(cmd->p_id[0]);
 		close(cmd->p_id[1]);
+		//close(cmd->p_id2[0]);
+		//cclose(cmd->p_id2[1]);
 	}
 	else
 	{
 		dup2(cmd->std_in, STDIN_FILENO);
 		close(cmd->std_in);
+		close(cmd->p_id[0]);
+                close(cmd->p_id[1]);
 	}
 }
 

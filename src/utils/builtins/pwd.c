@@ -21,12 +21,16 @@ char	*get_cwd(int i)
 	if (!cwd)
 		return ("Erreur");
 	if (!getcwd(cwd, 1024))
-		return ("");
+	{
+		free(cwd);
+		return (ft_strdup(""));
+	}
 	tmp = cwd;
 	if (i == 1 && ft_strlen(cwd) >= ft_strlen(getenv("HOME")))
 	{
 		tmp = ft_strjoin(ft_strdup("~"), ft_strdup(cwd
 					+ ft_strlen(getenv("HOME"))));
+		free(cwd);
 	}
 	if (tmp == NULL || tmp[0] == '\0')
 	{
@@ -42,9 +46,10 @@ char	*pwd(int i)
 	cwd = get_cwd(i);
 	if (cwd[0] == '\0')
 	{
+		free(cwd);
 		return (ft_strdup("pwd: error retrieving current directory:"
 			" getcwd: cannot access parent directories:"
-			" No such file or directory\n"));
+			" No such file or directory"));
 	}
 	else
 		return (cwd);

@@ -31,9 +31,12 @@ char	*check_path(char **paths, char *name)
 		return (name);
 	if (ft_strncmp(name, "/bin/", 5) == 0)
 	{
+		printf("%s\n", name);
 		if (access(name, F_OK | X_OK) == 0)
 			return (name);
 	}
+	if (!paths)
+		return (NULL);
 	while (paths[i])
 	{
 		tmp = ft_strjoin(ft_strdup(paths[i]), ft_strdup("/"));
@@ -56,17 +59,18 @@ void	execute(char **param, char *path, char **env)
 		ft_putendl_fd("minishell: is a directory", 2);
 		exit(126);
 	}
-	if (!path)
-	{
-		ft_putendl_fd("minishell: No such file or directory", 2);
-		exit(127);
-	}
+	//if (!path)
+	//{
+	//	ft_putendl_fd("minishell: No such file or directory", 2);
+	//	exit(127);
+	//}
 	paths = ft_split(path, ':');
 	path1 = check_path(paths, clean_quote(param[0]));
-	if (!path1 || !paths)
+	if (!path1)
 	{
 		ft_putendl_fd("minishell: command not found", 2);
-		free_tab(paths);
+		if (paths)
+			free_tab(paths);
 		exit(127);
 	}
 	if (execve(path1, param, env) == -1)

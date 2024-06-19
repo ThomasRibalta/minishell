@@ -52,6 +52,7 @@ int	execute_fork_builtin(char **env, char **export, char **par)
 		|| ft_strcmp(clean_quote(par[0]), "/bin/pwd") == 0)
 	{
 		pwd2 = pwd(0);
+		printf("%s\n", pwd2);
 		free(pwd2);
 	}
 	else

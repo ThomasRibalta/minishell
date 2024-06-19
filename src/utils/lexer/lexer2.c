@@ -83,14 +83,14 @@ char	*here_doc(char *end)
 	tmp2 = clean_quote(ft_strdup(end));
 	while (i != 1)
 	{
-		write(1, "Here_doc >> ", 13);
+		ft_putstr_fd("Here_doc (", 1);
+		ft_putstr_fd(tmp2, 1);
+		ft_putstr_fd(") >> ", 1);
 		tmp = get_next_line(0, 0);
 		if (ft_strncmp(tmp, tmp2, ft_strlen(end)) == 0)
 			break ;
 		value = ft_strjoin(value, tmp);
 	}
-	free(tmp);
-	tmp = get_next_line(0, 1);
 	free(tmp);
 	free(tmp2);
 	return (value);
