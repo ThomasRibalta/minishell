@@ -101,10 +101,12 @@ int	only_char(char *str, char c)
 	int	i;
 
 	i = 0;
+	if (!str)
+		return (0);
 	while (str[i])
 	{
 		if (str[i] != c)
-			return (i + 1);
+			return (i);
 		i++;
 	}
 	return (i);

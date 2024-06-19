@@ -55,14 +55,21 @@ void	replaceenvvars(char **str, char **env, int *exit_status)
 {
 	int		i;
 	char	*tmp;
+	char	*test;
 
 	i = -1;
 	tmp = *str;
+	test = NULL;
 	while (tmp[++i])
 	{
-		if (tmp[i] == '$' && in_special_zone(tmp, i) != 2 && tmp[i + 1])
+		if (tmp[i] == '$' && in_special_zone(tmp, i) != 2 && tmp[i + 1]
+			&& tmp[i + 1] != '$')
 		{
+			if (ft_strcmp(tmp, *str))
+				test = tmp;
 			replace_variable(&tmp, &i, env, exit_status);
+			if (test)
+				free(test);
 		}
 	}
 	*str = tmp;

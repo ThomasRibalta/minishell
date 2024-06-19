@@ -202,6 +202,7 @@ void					expenser(t_startnode *startNode);
 t_token					*createtoken(t_tokentype type, char *value);
 void					appendtoken(t_token **head, t_tokentype type,
 							char *value);
+int						is_only_spaces_and_tabs(const char *str);
 void					freetokens(t_token *head);
 char					**init_symbols(void);
 int						is_symbol(const char *str, int *symbol_length);

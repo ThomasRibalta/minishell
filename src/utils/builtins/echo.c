@@ -22,7 +22,7 @@ int	is_only_n(const char *str)
 			return (0);
 		str++;
 	}
-	return 1;
+	return (1);
 }
 
 void	echo(char **tab)

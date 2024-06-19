@@ -28,8 +28,8 @@ void	signal_handler(int signum, siginfo_t *siginfo, void *context)
 	if (signum == SIGINT && g_global_sig == 0)
 	{
 		rl_on_new_line();
-    		rl_replace_line("", 0);
-    		rl_redisplay();
+		rl_replace_line("", 0);
+		rl_redisplay();
 		make_readline = ft_strjoin(ft_strjoin(ft_strdup(VERT "→ " BLEU),
 					get_cwd(1)), ft_strdup(VIOLET " > " RESET));
 		write(1, "\n", 2);

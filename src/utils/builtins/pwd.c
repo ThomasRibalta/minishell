@@ -48,8 +48,8 @@ char	*pwd(int i)
 	{
 		free(cwd);
 		return (ft_strdup("pwd: error retrieving current directory:"
-			" getcwd: cannot access parent directories:"
-			" No such file or directory"));
+				" getcwd: cannot access parent directories:"
+				" No such file or directory"));
 	}
 	else
 		return (cwd);

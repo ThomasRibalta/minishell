@@ -83,6 +83,6 @@ void	start_terminal(char **env, char **export, int exit_status)
 	free_tab(*mainstruct.export);
 	clear_history();
 	make_readline = get_next_line(0, 1);
-        free(make_readline);
+	free(make_readline);
 	exit(*mainstruct.exit);
 }

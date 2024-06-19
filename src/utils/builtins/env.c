@@ -24,7 +24,7 @@ void	print_sorted_env(char **env)
 		j = i + 1;
 		while (env[j] != NULL)
 		{
-			if (ft_strcmp(env[i],env[j]) > 0)
+			if (ft_strcmp(env[i], env[j]) > 0)
 			{
 				tmp = env[i];
 				env[i] = env[j];

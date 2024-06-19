@@ -59,11 +59,6 @@ void	execute(char **param, char *path, char **env)
 		ft_putendl_fd("minishell: is a directory", 2);
 		exit(126);
 	}
-	//if (!path)
-	//{
-	//	ft_putendl_fd("minishell: No such file or directory", 2);
-	//	exit(127);
-	//}
 	paths = ft_split(path, ':');
 	path1 = check_path(paths, clean_quote(param[0]));
 	if (!path1)

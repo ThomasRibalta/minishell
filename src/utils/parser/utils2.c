@@ -14,30 +14,42 @@
 
 int	in_env(char *word, char **env)
 {
-	int	i;
+	char	*worde;
+	int		i;
 
 	i = 0;
+	worde = ft_strjoin(ft_strdup(word), ft_strdup("="));
 	while (env[i])
 	{
-		if (ft_strncmp(word, env[i], ft_strlen(word)) == 0)
+		if (ft_strncmp(worde, env[i], ft_strlen(worde)) == 0)
+		{
+			free(worde);
 			return (1);
+		}
 		i++;
 	}
+	free(worde);
 	return (0);
 }
 
 char	*get_env_value(char *word, char **env)
 {
-	int	i;
+	char	*worde;
+	int		i;
 
 	i = 0;
+	worde = ft_strjoin(ft_strdup(word), ft_strdup("="));
 	while (env[i])
 	{
-		if (ft_strncmp(word, env[i], ft_strlen(word)) == 0)
+		if (ft_strncmp(worde, env[i], ft_strlen(worde)) == 0)
+		{
+			free(worde);
 			return (ft_substr(env[i], ft_strlen(word) + 1, ft_strlen(env[i])
 					- ft_strlen(word) - 1));
+		}
 		i++;
 	}
+	free(worde);
 	return (NULL);
 }
 

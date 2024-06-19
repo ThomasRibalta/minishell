@@ -51,3 +51,18 @@ int	len_tab(char **tab)
 	}
 	return (i);
 }
+
+int	is_only_spaces_and_tabs(const char *str)
+{
+	if (str == NULL)
+	{
+		return (0);
+	}
+	while (*str != '\0')
+	{
+		if (*str != ' ' && *str != '\t')
+			return (0);
+		str++;
+	}
+	return (1);
+}
