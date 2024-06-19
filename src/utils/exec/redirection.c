@@ -16,13 +16,13 @@ char	*get_file_name(t_astnode *node)
 {
 	t_redirection	*tmp;
 	
-	printf("inputs : %s\n", node->inputs->filename);
-	tmp = node->inputs;
-	while (tmp->next)
+	while (node->inputs->next)
 	{
-		tmp = tmp->next;
+		tmp = node->inputs;
+		node->inputs = node->inputs->next;
+		free(tmp);
 	}
-	return (tmp->filename);
+	return (node->inputs->filename);
 }
 
 int	redirection_in(t_astnode *node, int *exit_status, t_command *cmd)
