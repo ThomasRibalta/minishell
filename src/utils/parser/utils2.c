@@ -12,34 +12,6 @@
 
 #include "../../header/minishell.h"
 
-void	addlogicalnodetostartnode(t_startnode *startnode, t_token *tokens)
-{
-	int			index;
-	t_token		*ct;
-	t_nodetype	type;
-
-	if (startnode->haslogical)
-	{
-		index = 0;
-		ct = tokens;
-		while (ct != NULL && index < startnode->childcount)
-		{
-			if (ct->type == TOKEN_LOGICAL_AND || ct->type == TOKEN_LOGICAL_OR)
-			{
-				if (ct->type == TOKEN_LOGICAL_AND)
-					type = NODE_LOGICAL_AND;
-				else
-					type = NODE_LOGICAL_OR;
-				startnode->children[index] = createlogicalnode(type);
-				index++;
-			}
-			ct = ct->next;
-		}
-	}
-	else
-		startnode->children[0] = createlogicalnode(NODE_LOGICAL_HOLDER);
-}
-
 int	in_env(char *word, char **env)
 {
 	int	i;

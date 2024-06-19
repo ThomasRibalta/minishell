@@ -248,9 +248,9 @@ void	parser(t_token *tokens, t_mainstruct mainstruct)
 {
 	t_startnode	*startnode;
 
-	startnode = createandsetupstartnode(tokens);
-	addlogicalnodetostartnode(startnode, tokens);
-	generateandattachbtree(startnode, tokens);
+	startnode = createAndSetupStartNode(tokens);
+	addLogicalNodeToStartNode(startnode, tokens);
+	generateAndAttachBTree(startnode, tokens);
 	expenser(startnode);
 	executer(startnode, mainstruct);
 }

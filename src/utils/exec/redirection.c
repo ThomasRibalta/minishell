@@ -73,8 +73,8 @@ void	handle_child_process(t_astnode *node, t_command *cmd)
 	{
 		dup2(cmd->std_out, STDOUT_FILENO);
 		close(cmd->std_out);
-		close(cmd->fd);
-		close(cmd->p_id[0]);
+		//close(cmd->fd);
+		//close(cmd->p_id[0]);
 	}
 }
 
@@ -101,8 +101,8 @@ void	handle_parent_process(t_astnode *node, t_command *cmd)
 	{
 		dup2(cmd->std_in, STDIN_FILENO);
 		close(cmd->std_in);
-		close(cmd->p_id[0]);
-                close(cmd->p_id[1]);
+		//close(cmd->p_id[0]);
+                //close(cmd->p_id[1]);
 	}
 }
 

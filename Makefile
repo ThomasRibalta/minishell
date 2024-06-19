@@ -4,6 +4,9 @@ RM = rm -f
 FLAGS = -Wall -Wextra -Werror
 
 SRC_1 = src/utils/parserNonNorme/parser.c \
+	src/utils/parser/expenser.c\
+	src/utils/parser/utils3.c\
+	src/utils/parser/utils2.c\
 				src/utils/wildcards/wildcards.c \
 				src/utils/wildcards/wildcards1.c \
 				src/utils/wildcards/wildcards3.c \
