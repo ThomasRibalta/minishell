@@ -70,8 +70,7 @@ void	start_terminal(char **env, char **export, int exit_status)
 	mainstruct = intialize_mainstruct(&env, &export, &exit_status, &exite);
 	while (*mainstruct.exit == -1)
 	{
-		make_readline = ft_strjoin(ft_strjoin(ft_strdup(VERT "→ " BLEU),
-					get_cwd(1)), ft_strdup(VIOLET " > " RESET));
+		make_readline = ft_strjoin(get_cwd(1), ft_strdup(" > "));
 		input = readline(make_readline);
 		if (!input)
 			stop_process(mainstruct, make_readline);

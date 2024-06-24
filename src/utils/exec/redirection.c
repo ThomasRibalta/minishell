@@ -19,6 +19,8 @@ char	*get_file_name(t_astnode *node)
 	while (node->inputs->next)
 	{
 		tmp = node->inputs;
+		if (access(node->inputs->filename, F_OK) != 0)
+			return (node->inputs->filename);
 		node->inputs = node->inputs->next;
 		free(tmp);
 	}
