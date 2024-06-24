@@ -3,10 +3,14 @@ CC = gcc
 RM = rm -f
 FLAGS = -Wall -Wextra -Werror
 
-SRC_1 = src/utils/parserNonNorme/parser.c \
-	src/utils/parser/expenser.c\
-	src/utils/parser/utils3.c\
-	src/utils/parser/utils2.c\
+SRC_1 = src/utils/parser/parser.c \
+				src/utils/parser/expenser.c\
+				src/utils/parser/utils3.c\
+				src/utils/parser/utils2.c\
+				src/utils/parser/utils.c\
+				src/utils/parser/redirection.c\
+				src/utils/parser/ast_gestion.c\
+				src/utils/parser/token_gestion.c\
 				src/utils/wildcards/wildcards.c \
 				src/utils/wildcards/wildcards1.c \
 				src/utils/wildcards/wildcards3.c \

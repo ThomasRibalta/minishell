@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: thomas.rba <thomas.rba@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:43:51 by toto              #+#    #+#             */
-/*   Updated: 2024/06/11 21:13:55 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/24 10:25:01 by thomas.rba       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,28 +174,6 @@ void					addlogicalnodetostartnode(t_startnode *startnode,
 int						in_env(char *word, char **env);
 char					*get_env_value(char *word, char **env);
 char					*get_word_env(char *tmp, int i, int *j, char **env);
-const char				*getnodetypestring(t_nodetype type);
-void					init_parsertmp(t_parsertmp *parsertmp);
-t_astnode				*buildcommand(t_token **ct);
-void					processtokens(t_startnode *startnode, t_token *tokens);
-int						countlogicalnodes(t_token *tokens);
-t_startnode				*createandsetupstartnode(t_token *tokens);
-t_astnode				*createastnode(t_nodetype type, char *value);
-t_logicalnode			*createlogicalnode(t_nodetype type);
-void					type_command_or_parent(t_token **ct,
-							t_astnode **currentcommand, t_astnode **root,
-							t_astnode **last);
-void					init_empty_cmd(t_parsertmp *parsertmp);
-void					parser_redirection(t_redirection **tempinputs,
-							t_redirection **tempoutputs, t_token **ct);
-void					handlepipeorlogicaloperator(t_token **ct,
-							t_parsertmp *parsertmp);
-t_redirection			*createredirection(char *filename, int caracteristic);
-void					addredirection(t_redirection **list,
-							t_redirection *redir);
-void					generateandattachbtree(t_startnode *startnode,
-							t_token *tokens);
-void					parser(t_token *tokens, t_mainstruct mainstruct);
 void					is_last_command_btree(t_astnode *node);
 void					is_last_command(t_startnode *startNode);
 void					expenser(t_startnode *startNode);
@@ -283,5 +261,36 @@ int						my_wexitstatus(int status);
 void					aff_tab(char **tab);
 void					stop_process(t_mainstruct mainstruct,
 							char *make_readline);
+int	count_logical_nodes(t_token *tokens);
+void	setup_start_node_children(t_startnode *start_node);
+void	setup_start_node(t_startnode *start_node, int logical_node_count);
+int	is_logical_operator(t_token *token);
+t_astnode	*build_command_pipe_tree_part2(t_token **current_token,
+	t_astnode **root, t_astnode **current_command);
+void	add_logical_node(t_startnode *start_node, t_token *current_token,
+	int *index);
+void	add_logical_node_to_start_node(t_startnode *start_node, t_token *tokens);
+void	process_command_token(t_astnode **root, t_astnode **current_command,
+	t_token *current_token);
+void	handle_pipe_token(t_astnode **root, t_astnode **current_command);
+void	process_other_tokens(t_astnode **root, t_astnode **current_command);
+void	add_redirection(t_redirection **list, t_redirection *redir);
+void	process_redirection_token(t_token *current_token,
+	t_redirection **temp_inputs, t_redirection **temp_outputs);
+void	update_command_redirections(t_astnode **current_command,
+	t_redirection *temp_inputs, t_redirection *temp_outputs);
+int	is_redirection(t_token *token);
+t_startnode	*create_start_node(void);
+t_startnode	*create_and_setup_start_node(t_token *tokens);
+t_astnode	*create_ast_node(t_nodetype type, char *value);
+t_logicalnode	*create_logical_node(t_nodetype type);
+t_redirection	*create_redirection(char *filename, int characteristic);
+t_astnode	*build_command_pipe_tree_part1(t_token **current_token,
+	t_astnode **root, t_astnode **current_command);
+t_astnode	*build_command_pipe_tree(t_token **current_token);
+void	generate_and_attach_btree_helper(t_startnode *start_node,
+	t_token **current_token, int *count);
+void	generate_and_attach_btree(t_startnode *start_node, t_token *tokens);
+void	parser(t_token *tokens, t_mainstruct mainstruct);
 
 #endif
