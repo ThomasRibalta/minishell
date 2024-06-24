@@ -1,4 +1,4 @@
-/** ************************************************************************** */
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   expenser.c                                         :+:      :+:    :+:   */
@@ -30,7 +30,8 @@ void	is_last_command(t_startnode *startNode)
 	i = 0;
 	if (!startNode->haslogical)
 	{
-		is_last_command_btree(startNode->children[0]->left);
+		is_last_command_btree(
+			startNode->children[0]->left);
 	}
 	else
 	{
@@ -39,7 +40,8 @@ void	is_last_command(t_startnode *startNode)
 			is_last_command_btree(startNode->children[i]->left);
 			if (i == 0 && startNode->children[i]->right)
 			{
-				is_last_command_btree(startNode->children[i]->right);
+				is_last_command_btree(
+					startNode->children[i]->right);
 			}
 			i++;
 		}
