@@ -31,7 +31,6 @@ char	*check_path(char **paths, char *name)
 		return (name);
 	if (ft_strncmp(name, "/bin/", 5) == 0)
 	{
-		printf("%s\n", name);
 		if (access(name, F_OK | X_OK) == 0)
 			return (name);
 	}
