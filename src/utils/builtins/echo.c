@@ -30,8 +30,6 @@ void	echo(char **tab)
 	int	i;
 
 	i = 1;
-	if (tab[1] == NULL || tab[1][0] == '\0')
-		ft_putchar_fd('\n', 1);
 	while (tab[i] && tab[i][0] == '-' && is_only_n(tab[i] + 1) == 1)
 		i++;
 	while (tab[i] != NULL)
@@ -41,6 +39,6 @@ void	echo(char **tab)
 			ft_putchar_fd(' ', 1);
 		i++;
 	}
-	if (tab[1] && ft_strncmp(tab[1], "-n", 2) != 0)
+	if (tab[1] && is_only_n(tab[1] + 1) != 1)
 		ft_putchar_fd('\n', 1);
 }
