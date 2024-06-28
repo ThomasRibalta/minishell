@@ -44,6 +44,7 @@ void	replace_variable(char **tmp, int *i, char **env, int *exit_status)
 	else
 	{
 		new = ft_strjoin(ft_substr(*tmp, 0, *i), ft_strdup((*tmp) + *i + j));
+		free(*tmp);
 		free(word);
 		*tmp = new;
 		(*i)--;

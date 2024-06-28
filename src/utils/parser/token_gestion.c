@@ -1,6 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   token_gestion.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: thomas.rba <thomas.rba@student.42.fr>      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/24 10:15:10 by thomas.rba        #+#    #+#             */
+/*   Updated: 2024/06/24 10:15:47 by thomas.rba       ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../header/minishell.h"
 
-void	add_logical_node(t_startnode *start_node, t_token *current_token, int *index)
+void	add_logical_node(t_startnode *start_node, t_token *current_token,
+	int *index)
 {
 	t_nodetype	type;
 
@@ -9,7 +22,7 @@ void	add_logical_node(t_startnode *start_node, t_token *current_token, int *inde
 	else if (current_token->type == TOKEN_LOGICAL_OR)
 		type = NODE_LOGICAL_OR;
 	else
-		return;
+		return ;
 	start_node->children[*index] = create_logical_node(type);
 	(*index)++;
 }
@@ -33,7 +46,8 @@ void	add_logical_node_to_start_node(t_startnode *start_node, t_token *tokens)
 		start_node->children[0] = create_logical_node(NODE_LOGICAL_HOLDER);
 }
 
-void	process_command_token(t_astnode **root, t_astnode **current_command, t_token *current_token)
+void	process_command_token(t_astnode **root, t_astnode **current_command,
+	t_token *current_token)
 {
 	t_nodetype	node_type;
 	t_astnode	*last;
