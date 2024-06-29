@@ -5,6 +5,7 @@ FLAGS = -Wall -Wextra -Werror
 
 SRC_1 = src/utils/parser/parser.c \
 				src/utils/parser/expenser.c\
+				src/utils/parser/parser_utils.c\
 				src/utils/parser/utils3.c\
 				src/utils/parser/utils2.c\
 				src/utils/parser/utils.c\
@@ -42,7 +43,7 @@ SRC_1 = src/utils/parser/parser.c \
 				src/utils/builtins/unset.c \
 				src/utils/gnl/get_next_line_utils.c \
 				src/utils/gnl/get_next_line.c
-			
+
 
 OBJ_1 = ${SRC_1:.c=.o}
 
