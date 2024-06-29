@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:43:51 by toto              #+#    #+#             */
-/*   Updated: 2024/06/25 17:34:13 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/06/29 03:01:42 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -261,46 +261,40 @@ int						my_wexitstatus(int status);
 void					aff_tab(char **tab);
 void					stop_process(t_mainstruct mainstruct,
 							char *make_readline);
-int						count_logical_nodes(t_token *tokens);
-void					setup_start_node_children(t_startnode *start_node);
-void					setup_start_node(t_startnode *start_node,
-							int logical_node_count);
-int						is_logical_operator(t_token *token);
-t_astnode				*build_command_pipe_tree_part2(t_token **current_token,
-							t_astnode **root, t_astnode **current_command);
-void					add_logical_node(t_startnode *start_node,
-							t_token *current_token, int *index);
-void					add_logical_node_to_start_node(t_startnode *start_node,
-							t_token *tokens);
-void					process_command_token(t_astnode **root,
-							t_astnode **current_command,
-							t_token *current_token);
-void					handle_pipe_token(t_astnode **root,
-							t_astnode **current_command);
-void					process_other_tokens(t_astnode **root,
-							t_astnode **current_command);
-void					add_redirection(t_redirection **list,
-							t_redirection *redir);
-void					process_redirection_token(t_token *current_token,
-							t_redirection **temp_inputs,
-							t_redirection **temp_outputs);
-void					update_command_redirections(t_astnode **current_command,
-							t_redirection *temp_inputs,
-							t_redirection *temp_outputs);
-int						is_redirection(t_token *token);
-t_startnode				*create_start_node(void);
-t_startnode				*create_and_setup_start_node(t_token *tokens);
-t_astnode				*create_ast_node(t_nodetype type, char *value);
-t_logicalnode			*create_logical_node(t_nodetype type);
-t_redirection			*create_redirection(char *filename, int characteristic);
-t_astnode				*build_command_pipe_tree_part1(t_token **current_token,
-							t_astnode **root, t_astnode **current_command);
-t_astnode				*build_command_pipe_tree(t_token **current_token);
-void					generate_and_attach_btree_helper(
-							t_startnode *start_node,
-							t_token **current_token, int *count);
-void					generate_and_attach_btree(t_startnode *start_node,
-							t_token *tokens);
-void					parser(t_token *tokens, t_mainstruct mainstruct);
+t_startnode	*create_start_node(void);
+t_startnode	*create_and_setup_start_node(t_token *tokens);
+t_astnode	*create_ast_node(t_nodetype type, char *value);
+t_logicalnode	*create_logical_node(t_nodetype type);
+t_redirection	*create_redirection(char *filename, int characteristic);
+void	is_last_command_btree(t_astnode *node);
+void	is_last_command(t_startnode *startNode);
+void	expenser(t_startnode *startNode);
+t_astnode	*build_command_pipe_tree(t_token **current_token);
+void	generate_and_attach_btree_helper(t_startnode *start_node, t_token **current_token, int *count);
+void	generate_and_attach_btree(t_startnode *start_node, t_token *tokens);
+const char	*get_node_type_string(t_nodetype type);
+void	print_redirections(const t_redirection *redir);
+void	print_ast(const t_astnode *node, int level);
+void	print_entire_ast(const t_startnode *start_node);
+void	parser(t_token *tokens, t_mainstruct mainstruct);
+int		process_token(t_token **token, t_astnode **root, t_astnode **cmd, t_redirection **inputs, t_redirection **outputs);
+void	process_command_token(t_astnode **root, t_astnode **cmd, t_token *token);
+void	handle_pipe_token(t_astnode **root, t_astnode **cmd, t_redirection **inputs, t_redirection **outputs);
+void	process_redirection_token(t_token *token, t_redirection **inputs, t_redirection **outputs);
+void	finalize_command(t_astnode **root, t_astnode **cmd, t_redirection **inputs, t_redirection **outputs);
+void	add_command_to_tree(t_astnode **root, t_astnode *cmd);
+int		is_redirection(t_token *token);
+int		is_logical_operator(t_token *token);
+void	add_logical_node(t_startnode *start_node, t_token *current_token, int *index);
+void	add_logical_node_to_start_node(t_startnode *start_node, t_token *tokens);
+void	add_redirection(t_redirection **list, t_redirection *redir);
+void	update_command_redirections(t_astnode **current_command, t_redirection *temp_inputs, t_redirection *temp_outputs);
+int		count_logical_nodes(t_token *tokens);
+void	setup_start_node_children(t_startnode *start_node);
+void	setup_start_node(t_startnode *start_node, int logical_node_count);
+void	process_other_tokens(t_astnode **root, t_astnode **current_command);
+void					finalize_command(t_astnode **root, t_astnode **cmd, t_redirection **inputs, t_redirection **outputs);
+int						process_token(t_token **token, t_astnode **root, t_astnode **cmd, t_redirection **inputs, t_redirection **outputs);
+
 
 #endif

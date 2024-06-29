@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: thomas.rba <thomas.rba@student.42.fr>      +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/24 10:10:56 by thomas.rba        #+#    #+#             */
-/*   Updated: 2024/06/24 10:12:07 by thomas.rba       ###   ########.fr       */
+/*   Updated: 2024/06/29 03:13:18 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,20 +27,20 @@ void	add_redirection(t_redirection **list, t_redirection *redir)
 	}
 }
 
-void	process_redirection_token(t_token *current_token,
-	t_redirection **temp_inputs, t_redirection **temp_outputs)
-{
-	t_redirection	*new_redir;
+// void	process_redirection_token(t_token *current_token,
+// 	t_redirection **temp_inputs, t_redirection **temp_outputs)
+// {
+// 	t_redirection	*new_redir;
 
-	new_redir = create_redirection(current_token->value,
-			(current_token->type == TOKEN_APPEND
-				|| current_token->type == TOKEN_HEREDOC));
-	if (current_token->type == TOKEN_IN || current_token->type == TOKEN_HEREDOC)
-		add_redirection(temp_inputs, new_redir);
-	else if (current_token->type == TOKEN_OUT
-		|| current_token->type == TOKEN_APPEND)
-		add_redirection(temp_outputs, new_redir);
-}
+// 	new_redir = create_redirection(current_token->value,
+// 			(current_token->type == TOKEN_APPEND
+// 				|| current_token->type == TOKEN_HEREDOC));
+// 	if (current_token->type == TOKEN_IN || current_token->type == TOKEN_HEREDOC)
+// 		add_redirection(temp_inputs, new_redir);
+// 	else if (current_token->type == TOKEN_OUT
+// 		|| current_token->type == TOKEN_APPEND)
+// 		add_redirection(temp_outputs, new_redir);
+// }
 
 void	update_command_redirections(t_astnode **current_command,
 	t_redirection *temp_inputs, t_redirection *temp_outputs)
@@ -52,8 +52,3 @@ void	update_command_redirections(t_astnode **current_command,
 	}
 }
 
-int	is_redirection(t_token *token)
-{
-	return (token->type == TOKEN_IN || token->type == TOKEN_OUT
-		|| token->type == TOKEN_APPEND || token->type == TOKEN_HEREDOC);
-}

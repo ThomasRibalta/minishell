@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_gestion.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: thomas.rba <thomas.rba@student.42.fr>      +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/24 10:15:10 by thomas.rba        #+#    #+#             */
-/*   Updated: 2024/06/24 10:15:47 by thomas.rba       ###   ########.fr       */
+/*   Updated: 2024/06/29 03:09:07 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,39 +46,39 @@ void	add_logical_node_to_start_node(t_startnode *start_node, t_token *tokens)
 		start_node->children[0] = create_logical_node(NODE_LOGICAL_HOLDER);
 }
 
-void	process_command_token(t_astnode **root, t_astnode **current_command,
-	t_token *current_token)
-{
-	t_nodetype	node_type;
-	t_astnode	*last;
+// void	process_command_token(t_astnode **root, t_astnode **current_command,
+// 	t_token *current_token)
+// {
+// 	t_nodetype	node_type;
+// 	t_astnode	*last;
 
-	if (current_token->type == TOKEN_COMMAND)
-		node_type = NODE_COMMAND;
-	else
-		node_type = NODE_PARENTHESE;
-	*current_command = create_ast_node(node_type, current_token->value);
-	if (*root == NULL)
-	{
-		*root = *current_command;
-	}
-	else
-	{
-		last = *root;
-		while (last->right != NULL)
-			last = last->right;
-		last->right = *current_command;
-	}
-}
+// 	if (current_token->type == TOKEN_COMMAND)
+// 		node_type = NODE_COMMAND;
+// 	else
+// 		node_type = NODE_PARENTHESE;
+// 	*current_command = create_ast_node(node_type, current_token->value);
+// 	if (*root == NULL)
+// 	{
+// 		*root = *current_command;
+// 	}
+// 	else
+// 	{
+// 		last = *root;
+// 		while (last->right != NULL)
+// 			last = last->right;
+// 		last->right = *current_command;
+// 	}
+// }
 
-void	handle_pipe_token(t_astnode **root, t_astnode **current_command)
-{
-	t_astnode	*pipe_node;
+// void	handle_pipe_token(t_astnode **root, t_astnode **current_command)
+// {
+// 	t_astnode	*pipe_node;
 
-	pipe_node = create_ast_node(NODE_PIPE, "|");
-	pipe_node->left = *root;
-	*root = pipe_node;
-	*current_command = NULL;
-}
+// 	pipe_node = create_ast_node(NODE_PIPE, "|");
+// 	pipe_node->left = *root;
+// 	*root = pipe_node;
+// 	*current_command = NULL;
+// }
 
 void	process_other_tokens(t_astnode **root, t_astnode **current_command)
 {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: thomas.rba <thomas.rba@student.42.fr>      +#+  +:+       +#+        */
+/*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/24 10:18:27 by thomas.rba        #+#    #+#             */
-/*   Updated: 2024/06/24 10:18:36 by thomas.rba       ###   ########.fr       */
+/*   Updated: 2024/06/29 03:10:24 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,11 @@ void	setup_start_node(t_startnode *start_node, int logical_node_count)
 	setup_start_node_children(start_node);
 }
 
-int	is_logical_operator(t_token *token)
-{
-	return (token->type == TOKEN_LOGICAL_AND
-		|| token->type == TOKEN_LOGICAL_OR);
-}
+// int	is_logical_operator(t_token *token)
+// {
+// 	return (token->type == TOKEN_LOGICAL_AND
+// 		|| token->type == TOKEN_LOGICAL_OR);
+// }
 
 t_astnode	*build_command_pipe_tree_part2(t_token **current_token,
 	t_astnode **root, t_astnode **current_command)
