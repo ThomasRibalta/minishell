@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: thomas.rba <thomas.rba@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:18:49 by toto              #+#    #+#             */
-/*   Updated: 2024/06/11 21:19:29 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/30 19:59:48 by thomas.rba       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,7 @@ void	lexer(char *input, t_mainstruct mainstruct)
 	tab_input = split_with_symbols(input);
 	tab_input = re_build_with_redir(tab_input);
 	tab_input = tab_clean(tab_input);
+	aff_tab(tab_input);
 	if (contains_invalid_sequences(tab_input, len_tab(tab_input), symbols))
 	{
 		*mainstruct.exit_status = 2;

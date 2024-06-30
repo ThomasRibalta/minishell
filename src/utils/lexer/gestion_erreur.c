@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   gestion_erreur.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: thomas.rba <thomas.rba@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:44:59 by toto              #+#    #+#             */
-/*   Updated: 2024/06/08 14:45:00 by toto             ###   ########.fr       */
+/*   Updated: 2024/06/30 19:59:37 by thomas.rba       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,18 @@ char	**tab_clean(char **tab)
 {
 	char	**new_tab;
 	int		j;
+	int 	i;
 
 	j = 0;
+	i = 0;
 	new_tab = malloc(sizeof(char *) * (len_tab(tab) + 1));
 	while (tab[j])
 	{
-		new_tab[j] = clean_white_space(tab[j]);
+		if (tab[i] && clean_white_space(tab[i])[0] == '\0')
+			i++;
+		new_tab[j] = clean_white_space(tab[i]);
 		j++;
+		i++;
 	}
 	free(tab);
 	new_tab[j] = 0;
@@ -73,6 +78,15 @@ bool	check_sequences(int i, int size, char **tab, char **symbols)
 	return (false);
 }
 
+bool	check_special(char **tab, int i)
+{
+	if (tab[i + 1] && (ft_strcmp(tab[i + 1], ">") == 0 || ft_strcmp(tab[i + 1], ">>" == 0)))
+	{
+		return (true);
+	}
+	return (false);
+}
+
 bool	contains_invalid_sequences(char **tab, int size, char **symbols)
 {
 	int	i;
@@ -86,7 +100,9 @@ bool	contains_invalid_sequences(char **tab, int size, char **symbols)
 		{
 			if (ft_strcmp(tab[i], symbols[j]) == 0)
 			{
-				if (check_sequences(i, size, tab, symbols))
+				if (ft_strcmp(tab[i], "|") == 0 &&  check_special(tab, i))
+					continue;
+				else if (check_sequences(i, size, tab, symbols))
 					return (true);
 			}
 			j++;
