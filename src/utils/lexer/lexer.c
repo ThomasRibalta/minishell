@@ -107,6 +107,18 @@ char	**re_build_with_redir(char **tab)
 	return (tab);
 }
 
+void aff_token(t_token *list)
+{
+	t_token	*tmp;
+
+	tmp = list;
+	while (tmp)
+	{
+		printf("value: %s type: %d\n", tmp->value, tmp->type);
+		tmp = tmp->next;
+	}
+}
+
 void	lexer(char *input, t_mainstruct mainstruct)
 {
 	char	**tab_input;
@@ -120,7 +132,6 @@ void	lexer(char *input, t_mainstruct mainstruct)
 	tab_input = split_with_symbols(input);
 	tab_input = re_build_with_redir(tab_input);
 	tab_input = tab_clean(tab_input);
-	aff_tab(tab_input);
 	if (contains_invalid_sequences(tab_input, len_tab(tab_input), symbols))
 	{
 		*mainstruct.exit_status = 2;
@@ -130,6 +141,7 @@ void	lexer(char *input, t_mainstruct mainstruct)
 	chained_split_prompt(&list, tab_input);
 	free_tab(tab_input);
 	free(symbols);
+	aff_token(list);
 	parser(list, mainstruct);
 	freetokens(list);
 }

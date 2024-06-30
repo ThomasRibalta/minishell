@@ -1,7 +1,7 @@
 NAME = minishell
 CC = gcc
 RM = rm -f
-FLAGS = -Wall -Wextra -Werror
+FLAGS =
 
 SRC_1 = src/utils/parser/parser.c \
 				src/utils/parser/expenser.c\

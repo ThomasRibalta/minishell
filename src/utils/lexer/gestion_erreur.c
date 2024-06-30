@@ -21,9 +21,9 @@ char	**tab_clean(char **tab)
 	j = 0;
 	i = 0;
 	new_tab = malloc(sizeof(char *) * (len_tab(tab) + 1));
-	while (tab[j])
+	while (tab[i])
 	{
-		if (tab[i] && clean_white_space(tab[i])[0] == '\0')
+		if (tab[i][0] == ' ' && tab[i][1] == '\0')
 			i++;
 		new_tab[j] = clean_white_space(tab[i]);
 		j++;
@@ -80,7 +80,7 @@ bool	check_sequences(int i, int size, char **tab, char **symbols)
 
 bool	check_special(char **tab, int i)
 {
-	if (tab[i + 1] && (ft_strcmp(tab[i + 1], ">") == 0 || ft_strcmp(tab[i + 1], ">>" == 0)))
+	if (tab[i + 1] && (ft_strcmp(tab[i + 1], ">") == 0 || ft_strcmp(tab[i + 1], ">>") == 0))
 	{
 		return (true);
 	}
@@ -101,7 +101,7 @@ bool	contains_invalid_sequences(char **tab, int size, char **symbols)
 			if (ft_strcmp(tab[i], symbols[j]) == 0)
 			{
 				if (ft_strcmp(tab[i], "|") == 0 &&  check_special(tab, i))
-					continue;
+					break ; 
 				else if (check_sequences(i, size, tab, symbols))
 					return (true);
 			}

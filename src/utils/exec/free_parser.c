@@ -17,6 +17,8 @@ void	processbinarytree2(t_astnode *node, t_command *cmd)
 	if (node == NULL)
 		return ;
 	processbinarytree2(node->left, cmd);
+	if (node->type == NODE_EMPTY_COMMAND)
+		exit(0);
 	if (node->type == NODE_COMMAND && *cmd->mainstruct.exit == -1)
 	{
 		if (node->outputs)
