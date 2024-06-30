@@ -141,7 +141,6 @@ void	lexer(char *input, t_mainstruct mainstruct)
 	chained_split_prompt(&list, tab_input);
 	free_tab(tab_input);
 	free(symbols);
-	aff_token(list);
 	parser(list, mainstruct);
 	freetokens(list);
 }
