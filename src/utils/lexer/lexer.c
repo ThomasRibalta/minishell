@@ -70,6 +70,15 @@ void	chained_split_prompt(t_token **list, char **tab)
 	}
 }
 
+int	condition(char **tab, int i)
+{
+	if (((tab[i][0] == '<' && (tab[i][1] == '\0'
+			|| tab[i][1] == '<')) || (tab[i][0] == '>'
+			&& (tab[i][1] == '\0' || tab[i][1] == '>'))) && tab[i + 1])
+		return (1);
+	return (0);
+}
+
 char	**re_build_with_redir(char **tab)
 {
 	char	**split_input;
@@ -79,9 +88,7 @@ char	**re_build_with_redir(char **tab)
 	i = -1;
 	while (tab[++i])
 	{
-		if (((tab[i][0] == '<' && (tab[i][1] == '\0'
-				|| tab[i][1] == '<')) || (tab[i][0] == '>'
-			&& (tab[i][1] == '\0' || tab[i][1] == '>'))) && tab[i + 1])
+		if (condition(tab, i))
 		{
 			split_input = ft_split(tab[i + 1], ' ');
 			if (len_tab(split_input) > 1)
@@ -90,6 +97,7 @@ char	**re_build_with_redir(char **tab)
 				tmptab[0] = ft_strdup(tab[i]);
 				tmptab[1] = ft_strdup(split_input[0]);
 				tmptab[2] = NULL;
+				free(tab[i + 1]);
 				tab[i + 1] = fuse_split_result(split_input, 1);
 				tab = fusionner_tableaux(tab, tmptab, i);
 			}
