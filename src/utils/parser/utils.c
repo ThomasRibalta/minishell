@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/24 10:18:27 by thomas.rba        #+#    #+#             */
-/*   Updated: 2024/06/29 03:10:24 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/06/29 23:45:39 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,37 +53,14 @@ void	setup_start_node(t_startnode *start_node, int logical_node_count)
 	setup_start_node_children(start_node);
 }
 
-// int	is_logical_operator(t_token *token)
-// {
-// 	return (token->type == TOKEN_LOGICAL_AND
-// 		|| token->type == TOKEN_LOGICAL_OR);
-// }
-
-t_astnode	*build_command_pipe_tree_part2(t_token **current_token,
-	t_astnode **root, t_astnode **current_command)
+void	finalize_command(t_astnode **root, t_astnode **cmd,
+		t_redirections *redirs)
 {
-	t_redirection	*temp_inputs;
-	t_redirection	*temp_outputs;
-
-	temp_inputs = NULL;
-	temp_outputs = NULL;
-	while (*current_token != NULL)
+	if (!*cmd && (redirs->inputs || redirs->outputs))
+		handle_empty_command(root, cmd, redirs);
+	if (*cmd)
 	{
-		if (is_logical_operator(*current_token))
-		{
-			process_other_tokens(root, current_command);
-			update_command_redirections(current_command, temp_inputs,
-				temp_outputs);
-			return (*root);
-		}
-		else if (is_redirection(*current_token))
-		{
-			process_redirection_token(*current_token, &temp_inputs,
-				&temp_outputs);
-		}
-		*current_token = (*current_token)->next;
+		(*cmd)->inputs = redirs->inputs;
+		(*cmd)->outputs = redirs->outputs;
 	}
-	process_other_tokens(root, current_command);
-	update_command_redirections(current_command, temp_inputs, temp_outputs);
-	return (*root);
 }

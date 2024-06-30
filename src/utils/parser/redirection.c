@@ -6,7 +6,7 @@
 /*   By: jedurand <jedurand@student.42perpignan.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/24 10:10:56 by thomas.rba        #+#    #+#             */
-/*   Updated: 2024/06/29 03:13:18 by jedurand         ###   ########.fr       */
+/*   Updated: 2024/06/29 23:45:19 by jedurand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,28 +27,30 @@ void	add_redirection(t_redirection **list, t_redirection *redir)
 	}
 }
 
-// void	process_redirection_token(t_token *current_token,
-// 	t_redirection **temp_inputs, t_redirection **temp_outputs)
-// {
-// 	t_redirection	*new_redir;
-
-// 	new_redir = create_redirection(current_token->value,
-// 			(current_token->type == TOKEN_APPEND
-// 				|| current_token->type == TOKEN_HEREDOC));
-// 	if (current_token->type == TOKEN_IN || current_token->type == TOKEN_HEREDOC)
-// 		add_redirection(temp_inputs, new_redir);
-// 	else if (current_token->type == TOKEN_OUT
-// 		|| current_token->type == TOKEN_APPEND)
-// 		add_redirection(temp_outputs, new_redir);
-// }
-
 void	update_command_redirections(t_astnode **current_command,
-	t_redirection *temp_inputs, t_redirection *temp_outputs)
+		t_redirections *redirs)
 {
 	if (*current_command)
 	{
-		(*current_command)->inputs = temp_inputs;
-		(*current_command)->outputs = temp_outputs;
+		(*current_command)->inputs = redirs->inputs;
+		(*current_command)->outputs = redirs->outputs;
 	}
 }
 
+int	is_redirection(t_token *token)
+{
+	if (token->type == TOKEN_IN || token->type == TOKEN_OUT)
+		return (1);
+	if (token->type == TOKEN_APPEND || token->type == TOKEN_HEREDOC)
+		return (1);
+	return (0);
+}
+
+int	is_logical_operator(t_token *token)
+{
+	if (token->type == TOKEN_LOGICAL_AND)
+		return (1);
+	if (token->type == TOKEN_LOGICAL_OR)
+		return (1);
+	return (0);
+}
