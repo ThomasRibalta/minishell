@@ -107,18 +107,6 @@ char	**re_build_with_redir(char **tab)
 	return (tab);
 }
 
-void aff_token(t_token *list)
-{
-	t_token	*tmp;
-
-	tmp = list;
-	while (tmp)
-	{
-		printf("value: %s type: %d\n", tmp->value, tmp->type);
-		tmp = tmp->next;
-	}
-}
-
 void	lexer(char *input, t_mainstruct mainstruct)
 {
 	char	**tab_input;

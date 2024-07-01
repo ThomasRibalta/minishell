@@ -12,35 +12,32 @@
 
 #include "../../header/minishell.h"
 
-void read_pipe(t_astnode *node, t_command *cmd)
+void	read_pipe(t_astnode *node, t_command *cmd)
 {
-	t_redirection *tmp;
+	t_redirection	*tmp;
+	char			*line;
 
-	if (node->outputs)
+	while (node->outputs->next)
 	{
-		while (node->outputs->next)
-		{
-			tmp = node->outputs;
-			node->outputs = node->outputs->next;
-			free(tmp);
-		}
-		char *line;
-		cmd->fd = open_output_append(node);
-		while (1)
-		{
-			line = get_next_line(0,0);
-			if (!line)
-				break;
-			write(cmd->fd, line, ft_strlen(line));
-			free(line);
-		}
-		if (node->is_last_command)
-		{
-			dup2(cmd->std_in, STDIN_FILENO);
-			close(cmd->std_in);
-			dup2(cmd->std_out, STDOUT_FILENO);
-			close(cmd->std_out);
-		}
+		tmp = node->outputs;
+		node->outputs = node->outputs->next;
+		free(tmp);
+	}
+	cmd->fd = open_output_append(node);
+	while (1)
+	{
+		line = get_next_line(0, 0);
+		if (!line)
+			break ;
+		write(cmd->fd, line, ft_strlen(line));
+		free(line);
+	}
+	if (node->is_last_command)
+	{
+		dup2(cmd->std_in, STDIN_FILENO);
+		close(cmd->std_in);
+		dup2(cmd->std_out, STDOUT_FILENO);
+		close(cmd->std_out);
 	}
 }
 
