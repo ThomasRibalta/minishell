@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils2.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: thomas.rba <thomas.rba@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 15:34:58 by toto              #+#    #+#             */
-/*   Updated: 2024/06/11 21:21:05 by toto             ###   ########.fr       */
+/*   Updated: 2024/07/02 16:50:37 by thomas.rba       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ char	*get_word_env(char *tmp, int i, int *j, char **env)
 	word = ft_substr(tmp + i + 1, 0, *j);
 	tmp2 = ft_strjoin(ft_strdup(word), ft_strdup("="));
 	while ((in_env(tmp2, env) != 1 && tmp[i + *j] && tmp[i + *j] != ' ' && tmp[i
-				+ *j] != '$'))
+				+ *j] != '$' && tmp[i + *j] != '"'))
 	{
 		free(word);
 		free(tmp2);

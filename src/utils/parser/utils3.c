@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils3.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: toto <toto@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: thomas.rba <thomas.rba@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:54:36 by toto              #+#    #+#             */
-/*   Updated: 2024/06/11 18:19:46 by toto             ###   ########.fr       */
+/*   Updated: 2024/07/02 16:51:01 by thomas.rba       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ void	replace_variable(char **tmp, int *i, char **env, int *exit_status)
 	else
 	{
 		new = ft_strjoin(ft_substr(*tmp, 0, *i), ft_strdup((*tmp) + *i + j));
-		free(*tmp);
 		free(word);
 		*tmp = new;
 		(*i)--;
