@@ -39,6 +39,6 @@ void	echo(char **tab)
 			ft_putchar_fd(' ', 1);
 		i++;
 	}
-	if (tab[1] && is_only_n(tab[1] + 1) != 1)
+	if (tab[1] && is_only_n(tab[1] + 1) != 1 || len_tab(tab) == 1)
 		ft_putchar_fd('\n', 1);
 }
